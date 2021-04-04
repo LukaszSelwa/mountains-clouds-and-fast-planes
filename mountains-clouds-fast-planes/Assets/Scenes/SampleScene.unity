@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -650,6 +650,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   forwardAcceleration: 25
   rotateAcceleration: 50
+  rollacceleration: 10
 --- !u!4 &856740254
 Transform:
   m_ObjectHideFlags: 0
@@ -766,6 +767,7 @@ GameObject:
   - component: {fileID: 1366810497}
   - component: {fileID: 1366810496}
   - component: {fileID: 1366810495}
+  - component: {fileID: 1366810498}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -825,9 +827,23 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1366810494}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -300, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1366810498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366810494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 523e46e1b8bca1f988a1a324907b3966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrainData: {fileID: 15600000, guid: a3b157090fa70466ea95eb56e007103f, type: 2}
+  resolution: 0
