@@ -73,7 +73,9 @@ Shader "Hidden/ImageCloudsShader"
                 float dstBack = min(max(dstToTopPlane, dstToBottomPlane), depth);
 
                 if (dstBack > 0 && dstFront < depth) {
-                    col = 0.8 +  col * 0.2;
+                    float density = dstBack - max(0, dstFront);
+                    float fog = 1 / (0.2 * density + 1);
+                    col = 1 - fog + col * fog;
                 }
                 return col;
             }
