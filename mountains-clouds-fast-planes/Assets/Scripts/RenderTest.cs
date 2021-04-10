@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ImageEffectAllowedInSceneView, ExecuteInEditMode, RequireComponent(typeof(Camera))]
+[ImageEffectAllowedInSceneView, RequireComponent(typeof(Camera))]
 public class RenderTest : MonoBehaviour
 {
     public Shader shader;
