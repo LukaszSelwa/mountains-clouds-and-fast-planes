@@ -7,12 +7,13 @@ public class TerrainGenerator : MonoBehaviour
     public TerrainData terrainData;
     public float[,] heightmap;
     public int resolution;
+    public int seed = 2133;
 
     // Start is called before the first frame update
     void Start()
     {
         //Temporary, should be done elsewhere
-        Random.InitState(2133);
+        Random.InitState(seed);
 
         resolution = terrainData.heightmapResolution;
         heightmap = terrainData.GetHeights(0, 0, resolution, resolution);
