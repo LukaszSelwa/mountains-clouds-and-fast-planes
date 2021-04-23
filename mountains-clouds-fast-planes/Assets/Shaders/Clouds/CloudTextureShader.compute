@@ -1,0 +1,32 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture3D<float4> Result;
+RWStructuredBuffer<uint3> RPts;
+int PointsNr;
+int Resolution;
+
+uint3 getPoint(int3 idx) {
+    return RPts[idx.x*PointsNr*PointsNr + idx.y*PointsNr + idx.z];
+}
+
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint gridLen = (uint)Resolution / (uint)PointsNr;
+    float maxLen = gridLen * 1.41421;  
+    float minDist = maxLen;
+    int3 pId = id / gridLen;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                int3 d = int3(dx, dy, dz);
+                float3 randPoint = (float3)gridLen * (float3)(pId + d) + getPoint((pId + d + PointsNr) % PointsNr);
+                minDist = min(minDist, length((float3)id - randPoint));
+            }
+        }
+    }
+    Result[id.xyz] = minDist / maxLen;
+}

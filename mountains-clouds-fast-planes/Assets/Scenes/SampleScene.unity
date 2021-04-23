@@ -1266,6 +1266,7 @@ GameObject:
   - component: {fileID: 1815980868}
   - component: {fileID: 1815980867}
   - component: {fileID: 1815980866}
+  - component: {fileID: 1815980865}
   m_Layer: 0
   m_Name: CloudsContainer
   m_TagString: Untagged
@@ -1273,6 +1274,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1815980865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815980864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce041a5e5c67046fd8afa1eb40400f2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  computeShader: {fileID: 7200000, guid: 59eb497f4284442f8bca3aa1ffa9a945, type: 3}
+  texture3DSlicer: {fileID: 0}
+  texture3D: {fileID: 0}
+  renderTexture: {fileID: 0}
+  renderSlice: {fileID: 0}
+  resolution: 32
+  slice: 0
 --- !u!23 &1815980866
 MeshRenderer:
   m_ObjectHideFlags: 0
