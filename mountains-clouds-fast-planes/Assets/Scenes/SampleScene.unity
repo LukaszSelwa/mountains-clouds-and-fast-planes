@@ -928,8 +928,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardAcceleration: 25
-  rotateAcceleration: 50
-  rollacceleration: 10
+  pitchAcceleration: 45
+  yawAcceleration: 15
+  rollAcceleration: 75
+  maxVelocity: 150
+  dragMultiplier: 0.7
+  gravityAcceleration: 0
+  velocity: {x: 0, y: 0, z: 0}
+  throttle: 0
 --- !u!4 &856740254
 Transform:
   m_ObjectHideFlags: 0
@@ -938,7 +944,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 856740252}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 500, y: 1, z: 500}
+  m_LocalPosition: {x: 500, y: 20, z: 500}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1998742418}
@@ -976,6 +982,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1062,6 +1069,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shader: {fileID: 4800000, guid: 8b48c1e012d3045cf9b9ffdd3473681f, type: 3}
   container: {fileID: 1815980868}
+  scaleCloudTex: 0.002
+  fogFactor: 0.05
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce041a5e5c67046fd8afa1eb40400f2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  computeShader: {fileID: 7200000, guid: 59eb497f4284442f8bca3aa1ffa9a945, type: 3}
+  texturesCombiner: {fileID: 7200000, guid: ed8303b6dc9764e7c97ec39b5c6d6c48, type: 3}
+  largeCloudTexture: {fileID: 0}
+  smallCloudTexture: {fileID: 0}
+  cloudTexture: {fileID: 0}
+  resolution: 256
+  smallCloudResolution: 32
+  largeTexturePointsNumber: 6
+  smallTexturePointsNumber: 5
+  largeCloudThreshold: 0.5
+  smallCloudThreshold: 0.05
+  smallCloudScale: 1
 --- !u!4 &964807758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
@@ -1266,7 +1299,6 @@ GameObject:
   - component: {fileID: 1815980868}
   - component: {fileID: 1815980867}
   - component: {fileID: 1815980866}
-  - component: {fileID: 1815980865}
   m_Layer: 0
   m_Name: CloudsContainer
   m_TagString: Untagged
@@ -1274,25 +1306,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1815980865
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1815980864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce041a5e5c67046fd8afa1eb40400f2e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  computeShader: {fileID: 7200000, guid: 59eb497f4284442f8bca3aa1ffa9a945, type: 3}
-  texture3DSlicer: {fileID: 0}
-  texture3D: {fileID: 0}
-  renderTexture: {fileID: 0}
-  renderSlice: {fileID: 0}
-  resolution: 32
-  slice: 0
 --- !u!23 &1815980866
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1312,8 +1325,7 @@ MeshRenderer:
   m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 808ce29c688194257bd5d2a9cfc5c0b7, type: 2}
+  m_Materials: []
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1352,7 +1364,7 @@ Transform:
   m_GameObject: {fileID: 1815980864}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 547.9, y: 43.5, z: 626.7}
-  m_LocalScale: {x: 53.79283, y: 11.083327, z: 60.6782}
+  m_LocalScale: {x: 53.79283, y: 50, z: 60.6782}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3

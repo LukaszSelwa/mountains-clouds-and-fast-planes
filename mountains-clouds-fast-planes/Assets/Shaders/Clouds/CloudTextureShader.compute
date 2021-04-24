@@ -28,5 +28,5 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             }
         }
     }
-    Result[id.xyz] = minDist / maxLen;
+    Result[id.xyz] = 1 - (minDist / maxLen);
 }

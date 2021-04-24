@@ -2,7 +2,7 @@ Shader "Hidden/ImageCloudsShader"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex  ("Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -16,6 +16,8 @@ Shader "Hidden/ImageCloudsShader"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+
+            #define MAX_STEP_COUNT 32
 
             struct appdata
             {
@@ -40,7 +42,7 @@ Shader "Hidden/ImageCloudsShader"
 
             v2f vert (appdata v)
             {
-                v2f o;
+                v2f o; 
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 // Camera space matches OpenGL convention where cam forward is -z. In unity forward is positive z.
@@ -52,8 +54,26 @@ Shader "Hidden/ImageCloudsShader"
 
             sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
+            
+            Texture3D<float4> NoiseTex;
+            SamplerState my_point_repeat_sampler;
+            
             float BottomPlane;
             float TopPlane;
+            float ScaleCloudTex;
+            float FogFactor;
+
+            float sampleDensity(float3 rayOrg, float3 rayDir, float length) {
+                float density = 0.0;
+                fixed4 sample;
+                float step = length / MAX_STEP_COUNT;
+                for (int i = 0; i <= MAX_STEP_COUNT; ++i) {
+                    sample = NoiseTex.Sample(my_point_repeat_sampler, rayOrg * ScaleCloudTex);
+                    density += step * sample.r;
+                    rayOrg += step * rayDir;
+                }
+                return density;
+            }
 
             fixed4 frag (v2f i) : SV_Target
             {
@@ -73,8 +93,10 @@ Shader "Hidden/ImageCloudsShader"
                 float dstBack = min(max(dstToTopPlane, dstToBottomPlane), depth);
 
                 if (dstBack > 0 && dstFront < depth) {
-                    float density = dstBack - max(0, dstFront);
-                    float fog = 1 / (0.2 * density + 1);
+                    dstFront = max(0.0f, dstFront);
+                    dstBack = min(depth, dstBack);
+                    float density = sampleDensity(rayOrigin + rayDir * dstFront, rayDir, dstBack - dstFront);
+                    float fog = exp(-FogFactor * density);
                     col = 1 - fog + col * fog;
                 }
                 return col;

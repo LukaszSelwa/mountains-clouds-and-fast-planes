@@ -6,9 +6,14 @@ public class CloudTextureComputer : MonoBehaviour
 {
     public ComputeShader computeShader;
     public ComputeShader texturesCombiner;
+    
+    [HideInInspector]
     public RenderTexture largeCloudTexture;
+    
+    [HideInInspector]
     public RenderTexture smallCloudTexture;
 
+    [HideInInspector]
     public RenderTexture cloudTexture;
 
     public int resolution = 128;
@@ -25,9 +30,6 @@ public class CloudTextureComputer : MonoBehaviour
 
     [Range(0.0f, 10.0f)]
     public float smallCloudScale;
-    
-    [Range(0.0f, 1.0f)]
-    public float combineFactor;
 
     void Start() {
         largeCloudTexture = ComputeRenderTexture(largeTexturePointsNumber, resolution);
@@ -50,7 +52,6 @@ public class CloudTextureComputer : MonoBehaviour
         texturesCombiner.SetFloat("LargeThreshold", largeCloudThreshold);
         texturesCombiner.SetFloat("SmallThreshold", smallCloudThreshold);
         texturesCombiner.SetFloat("Scale", smallCloudScale);
-        texturesCombiner.SetFloat("CombineFactor", combineFactor);
         texturesCombiner.Dispatch(0, res / 8, res / 8, res / 8);
     }
 
