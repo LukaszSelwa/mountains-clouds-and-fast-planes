@@ -941,7 +941,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 856740252}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 500, y: 20, z: 500}
+  m_LocalPosition: {x: 500, y: 100, z: 500}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1998742418}
@@ -1258,8 +1258,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrainData: {fileID: 15600000, guid: 7b90b0da031e8444bb896aa276160cc0, type: 2}
-  resolution: 0
   seed: 2133
+  mountainNum: 100
+  chainProbability: 0.999
+  chainSparsity: 8
+  scale: 3
+  roughness: 0.005
 --- !u!1 &1490114241 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2035258822359727837, guid: 71fbc79ea5b9d4a8cad647f897de45fb,

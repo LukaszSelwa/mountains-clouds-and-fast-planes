@@ -2,12 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class TerrainGenerator : MonoBehaviour
 {
     public TerrainData terrainData;
-    public float[,] heightmap;
-    public int resolution;
+    float[,] heightmap;
+    int resolution;
     public int seed = 2133;
+    public int chainNumber = 100;
+    public float chainProbability = 0.999F;
+    public int chainSparsity = 8;
+    public float scale = 2.0F;
+    public float roughness = 0.005F;
+
+    public float stErosionRate = 0.3F;
+    public int stErosionDuration = 38;
+    public float ndErosionRate = 0.1F;
+    public int ndErosionDuration = 12;
 
     // Start is called before the first frame update
     void Start()
@@ -18,43 +29,56 @@ public class TerrainGenerator : MonoBehaviour
         resolution = terrainData.heightmapResolution;
         heightmap = terrainData.GetHeights(0, 0, resolution, resolution);
 
-        GenerateTerrainExperimental(); 
+        GenerateTerrainChained(); 
         terrainData.SetHeights(0, 0, heightmap);
     }
 
-    // Update is called once per frame
-    void Update()
+    float Sigmoid(float X)
     {
-        
+        return (float)(System.Math.Exp(X)/(System.Math.Exp(X) + 1));
     }
 
-    void GenerateTerrainSimple()
+    void PutInRange()
     {
-        SetNeutralHeight();
-        for (int l = 0; l < 1; l++)
-        {
-            AddRandomPoints(50000, 0.0F, 1.0F);
-            Erode(0.01F, 1000);
-        }
-        terrainData.SetHeights(0, 0, heightmap);
-    }
-
-    void GenerateTerrainExperimental()
-    {
-        SetNeutralHeight();
-
-        GenerateChains(10, 0.999F, 0.01F, 4, -0.15F, -0.1F, 80, 0.8F);
-        GenerateChains(100, 0.999F, 0.01F, 8, -0.1F, 0.35F, 100, 0.4F);
         for (int i = 0; i < resolution; i++)
         {
             for (int j = 0; j < resolution; j++)
-                heightmap[i,j] += Random.Range(-0.006F, 0.006F);
+                heightmap[i,j] = Sigmoid(heightmap[i,j]);
         }
-
-        Erode(0.1F, 12);
     }
 
-    void GenerateChains(int chains, float chainingRate, float changeRate, int chainDist, float lowH, float highH, int epochs, float erosionRate)
+    void ScaleHeightmap(float neutral, float factor)
+    {
+        for (int i = 0; i < resolution; i++)
+        {
+            for (int j = 0; j < resolution; j++)
+                heightmap[i,j] = ((heightmap[i,j] - neutral) * factor) + neutral;
+        }
+    }
+
+    void GenerateTerrainChained()
+    {
+        SetNeutralHeight();
+
+        GenerateChains(chainNumber, chainProbability, 0.01F, chainSparsity, -0.1F, 0.35F);
+        
+        PutInRange();
+        Erode(stErosionRate, stErosionDuration);
+        
+        float neutral = Sigmoid(0.5F);
+        ScaleHeightmap(neutral, scale);
+
+        for (int i = 0; i < resolution; i++)
+        {
+            for (int j = 0; j < resolution; j++)
+                heightmap[i,j] += Random.Range(-roughness, roughness);
+        }
+
+        Erode(ndErosionRate, ndErosionDuration);
+    }
+
+
+    void GenerateChains(int chains, float chainingRate, float changeRate, int chainDist, float lowH, float highH)
     {
         for (int i = 0; i < chains; i++)
         {
@@ -62,8 +86,6 @@ public class TerrainGenerator : MonoBehaviour
             int r_y = Random.Range(0, resolution-1);
             AddChainedPoint(r_x, r_y, lowH, highH, chainDist, chainingRate, changeRate);
         }
-
-        Erode(erosionRate, epochs);
     }
 
     void SetNeutralHeight()
@@ -92,7 +114,7 @@ public class TerrainGenerator : MonoBehaviour
     float GetCell(int x, int y)
     {
         if(x<0 || x >= resolution || y < 0 || y >= resolution)
-            return 0.5F;
+            return Sigmoid(0.5F);
         return heightmap[x,y];
     }
 
