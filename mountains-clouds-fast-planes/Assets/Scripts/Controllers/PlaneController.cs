@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Controllers;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlaneController : MonoBehaviour
 {
@@ -13,6 +15,23 @@ public class PlaneController : MonoBehaviour
     
     public float throttle;
 
+    public int maxHitPoints = 100;
+    private int _currentHitPoints;
+    
+    public int hitPoints
+    {
+        get => _currentHitPoints;
+
+        set
+        {
+            _currentHitPoints = value;
+            if (_currentHitPoints <= 0)
+            {
+                TriggerGameOver();
+            }
+        }
+    }
+
     private Rigidbody _rb;
 
     private void Start()
@@ -22,6 +41,8 @@ public class PlaneController : MonoBehaviour
         
         // set the initial throttle
         throttle = 0.5f;
+        
+        _currentHitPoints = maxHitPoints;
     }
 
     // Update is called once per frame
@@ -46,5 +67,19 @@ public class PlaneController : MonoBehaviour
         // calculate the acceleration
         var force = direction * (forwardAcceleration * throttle);
         _rb.AddForce(force, ForceMode.Acceleration);
+    }
+    
+    private void OnCollisionEnter(Collision collision)
+    {
+        var message = $"{collision.impulse.magnitude}";
+        message = collision.contacts.Aggregate(message, (current, contact) => current + $", {contact.thisCollider}");
+        print(message);
+
+        hitPoints -= (int)(collision.impulse.magnitude * 0.01);
+    }
+
+    private void TriggerGameOver()
+    {
+        SceneManager.LoadScene("Menu");
     }
 }
