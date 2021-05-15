@@ -1245,17 +1245,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 523e46e1b8bca1f988a1a324907b3966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  firstTerrain: {fileID: 0}
   terrainData: {fileID: 15600000, guid: 7b90b0da031e8444bb896aa276160cc0, type: 2}
   seed: 2133
-  chainNumber: 100
+  terrainSize: 1000
+  chainNumber: 30
   chainProbability: 0.999
   chainSparsity: 8
   scale: 3
-  roughness: 0.005
-  stErosionRate: 0.3
-  stErosionDuration: 38
-  ndErosionRate: 0.1
-  ndErosionDuration: 12
+  roughness: 0.01
+  stErosionRate: 0.8
+  stErosionDuration: 5
+  ndErosionRate: 0.4
+  ndErosionDuration: 2
 --- !u!1 &1490114241 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2035258822359727837, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
