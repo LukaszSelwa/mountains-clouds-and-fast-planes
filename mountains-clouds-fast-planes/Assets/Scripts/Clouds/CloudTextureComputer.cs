@@ -9,6 +9,12 @@ public class CloudTextureComputer : MonoBehaviour
     
     [HideInInspector]
     public RenderTexture largeCloudTexture;
+
+    [HideInInspector]
+    public Texture3D prelinNoise;
+
+    [Range(0.0f, 10.0f)]
+    public float perlinNoiseScale;
     
     [HideInInspector]
     public RenderTexture smallCloudTexture;
@@ -17,8 +23,6 @@ public class CloudTextureComputer : MonoBehaviour
     public RenderTexture cloudTexture;
 
     public int resolution = 128;
-
-    public int smallCloudResolution = 16;
     public int largeTexturePointsNumber = 4;
     public int smallTexturePointsNumber = 4;
 
@@ -30,10 +34,14 @@ public class CloudTextureComputer : MonoBehaviour
 
     [Range(0.0f, 10.0f)]
     public float smallCloudScale;
+    
+    [Range(0.0f, 1.0f)]
+    public float perlinNoiseFactor, largeWorleyFactor, smallWorleyFactor;
 
     void Start() {
         largeCloudTexture = ComputeRenderTexture(largeTexturePointsNumber, resolution);
-        smallCloudTexture = ComputeRenderTexture(smallTexturePointsNumber, smallCloudResolution);
+        smallCloudTexture = ComputeRenderTexture(smallTexturePointsNumber, resolution);
+        prelinNoise = PerlinNoise3DComputer.ComputePerlinNoise(resolution, perlinNoiseScale);
 
         cloudTexture = CreateRenderTexture(resolution);
         CombineTextures(cloudTexture, largeCloudTexture, smallCloudTexture);
@@ -47,11 +55,15 @@ public class CloudTextureComputer : MonoBehaviour
         int res = result.width;
         texturesCombiner.SetTexture(0, "Result", result);
         texturesCombiner.SetTexture(0, "LargeTexture", largeTexture);
+        texturesCombiner.SetTexture(0, "PerlinNoise", prelinNoise);
         texturesCombiner.SetTexture(0, "SmallTexture", smallTexture);
-        texturesCombiner.SetInt("SmallTextureResolution", smallCloudResolution);
+        texturesCombiner.SetInt("SmallTextureResolution", resolution);
         texturesCombiner.SetFloat("LargeThreshold", largeCloudThreshold);
         texturesCombiner.SetFloat("SmallThreshold", smallCloudThreshold);
         texturesCombiner.SetFloat("Scale", smallCloudScale);
+        texturesCombiner.SetFloat("PerlinFactor", perlinNoiseFactor);
+        texturesCombiner.SetFloat("LargeWorleyFactor", largeWorleyFactor);
+        texturesCombiner.SetFloat("SmallWorleyFactor", smallWorleyFactor);
         texturesCombiner.Dispatch(0, res / 8, res / 8, res / 8);
     }
 
@@ -59,7 +71,7 @@ public class CloudTextureComputer : MonoBehaviour
         var texture = CreateRenderTexture(res);
         var points = CreateRandomPoints(pointsNumber, res);
 
-        var pointsBuffer = createPointsBuffer(points);
+        var pointsBuffer = CreatePointsBuffer(points);
 
         computeShader.SetTexture(0, "Result", texture);
         computeShader.SetInt("PointsNr", pointsNumber);
@@ -96,7 +108,7 @@ public class CloudTextureComputer : MonoBehaviour
         return points;
     }
 
-    private ComputeBuffer createPointsBuffer(Vector3Int[] points) {
+    private ComputeBuffer CreatePointsBuffer(Vector3Int[] points) {
         int size = 3 * sizeof(int);
         ComputeBuffer pointsBuffer = new ComputeBuffer(points.Length, size);
         pointsBuffer.SetData(points);

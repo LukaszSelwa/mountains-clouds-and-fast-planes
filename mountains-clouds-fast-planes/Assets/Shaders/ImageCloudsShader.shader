@@ -3,6 +3,7 @@ Shader "Hidden/ImageCloudsShader"
     Properties
     {
         _MainTex  ("Texture", 2D) = "white" {}
+        _CloudDarkColor ("Cloud Dark Color", Color) = (1,1,1,1)
     }
     SubShader
     {
@@ -17,7 +18,8 @@ Shader "Hidden/ImageCloudsShader"
 
             #include "UnityCG.cginc"
 
-            #define MAX_STEP_COUNT 32
+            #define MAX_STEP_COUNT 10
+            #define LIGHT_SAMPLES 3
 
             struct appdata
             {
@@ -34,7 +36,7 @@ Shader "Hidden/ImageCloudsShader"
 
             // Distance from ray origin to plane (0*X + planeY * Y + 0*Z = 0) looking towards ray direction.
             // Vector rayDir should be normalized
-            float rayYPlaneDst(float planeY, float3 rayOrigin, float3 rayDir) {
+            inline float rayYPlaneDst(float planeY, float3 rayOrigin, float3 rayDir) {
                 float t = (planeY - rayOrigin.y) / rayDir.y;
                 // float3 dstVec = t * rayDir;
                 return t;
@@ -55,24 +57,85 @@ Shader "Hidden/ImageCloudsShader"
             sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
             
-            Texture3D<float4> NoiseTex;
-            SamplerState my_point_repeat_sampler;
-            
-            float BottomPlane;
-            float TopPlane;
-            float ScaleCloudTex;
-            float FogFactor;
+            Texture3D<float4> _NoiseTex;
+            Texture2D<float4> _FluidTex;
 
-            float sampleDensity(float3 rayOrg, float3 rayDir, float length) {
-                float density = 0.0;
-                fixed4 sample;
-                float step = length / MAX_STEP_COUNT;
-                for (int i = 0; i <= MAX_STEP_COUNT; ++i) {
-                    sample = NoiseTex.Sample(my_point_repeat_sampler, rayOrg * ScaleCloudTex);
-                    density += step * sample.r;
-                    rayOrg += step * rayDir;
+            // samplers
+            SamplerState my_linear_repeat_sampler;
+            SamplerState fluid_linear_repeat_sampler;
+            
+            // Planes constants
+            float _BottomPlane;
+            float _TopPlane;
+            float _TopDeclinePlane;
+            float _BottomDeclinePlane;
+
+
+            float _ScaleLargeWorley;
+            float _ScaleSmallWorley;
+            float _FogFactor;
+            float _MinLightScatter;
+            float _MaxLightScatter;
+            float _LightFactor;
+            float _CloudThreshold;
+            float _SmallNoiseFactor;
+
+            fixed4 _DistFogColor;
+            fixed4 _CloudDarkColor;
+
+            float _DistortOffset;
+
+            float _DistanceFogFactor;
+
+            float sampleCloudNoise(float3 pos) {
+                float large = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleLargeWorley).r;
+                float small = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleSmallWorley).g;
+                float sample = lerp(large, small, _SmallNoiseFactor);
+
+                if (pos.y > _TopDeclinePlane) {
+                    sample = sample * (_TopPlane - pos.y) / (_TopPlane - _TopDeclinePlane);
                 }
-                return density;
+                if (pos.y < _BottomDeclinePlane) {
+                    sample = sample * (pos.y - _BottomPlane) / (_BottomDeclinePlane - _BottomPlane);
+                }
+                sample = max(0, sample - _CloudThreshold) / (1 - _CloudThreshold);
+                return sample;
+            }
+
+            float sampleLight(float3 pos, float3 lightDir) {
+                float dstToTopPlane = rayYPlaneDst(_TopPlane, pos, -lightDir);
+                float density = 0.0;
+                float step = dstToTopPlane / LIGHT_SAMPLES;
+                for (int i = 0; i < LIGHT_SAMPLES; ++i) {
+                    density += sampleCloudNoise(pos);
+                    pos += -step * lightDir;
+                }
+                return step * density;
+            }
+
+            float3 sampleDistortNoise(uint2 uv) {
+                float2 pos = float2(uv.x*_ScreenParams.x, uv.y*_ScreenParams.y);
+                pos = pos / 1000;
+                return _FluidTex.Sample(fluid_linear_repeat_sampler, pos);
+            } 
+
+            float2 sampleDensity(float3 pos, float3 rayDir, float distance, float3 lightDir) {
+                float density = 0.0;
+                float sample;
+                float step = distance / MAX_STEP_COUNT;
+                float scatteredlight = 0.0;
+                float transmittance = 1.0;
+                float lightScatterCoef = lerp(_MinLightScatter, _MaxLightScatter, length(cross(lightDir, -rayDir)));
+                for (int i = 0; i <= MAX_STEP_COUNT; ++i) {
+                    sample = sampleCloudNoise(pos);
+                    density += step * sample.r;
+                    if (sample > 0) {
+                        transmittance *= exp(-step * sample * _FogFactor);
+                        scatteredlight += exp(-lightScatterCoef * (sampleLight(pos, lightDir))) * density * step * transmittance;
+                    }
+                    pos += step * rayDir;
+                } 
+                return float2(transmittance, step * scatteredlight);
             }
 
             fixed4 frag (v2f i) : SV_Target
@@ -82,22 +145,38 @@ Shader "Hidden/ImageCloudsShader"
                 float viewLength = length(i.viewVector);
                 float3 rayDir = i.viewVector / viewLength;
 
+                float3 lightDirection = -_WorldSpaceLightPos0.xyz;
+
                 // Depth towards other object in the scene
                 float nonlin_depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-                float depth = LinearEyeDepth(nonlin_depth) * viewLength;
+                float depthLinear = max(LinearEyeDepth(nonlin_depth) * viewLength, 0);
+                // Ignore the value of depth if it reaches its maximum 
+                bool infiniteDepth = Linear01Depth(nonlin_depth) >= 1.0;
                 
-                float dstToTopPlane = rayYPlaneDst(TopPlane, rayOrigin, rayDir);
-                float dstToBottomPlane = rayYPlaneDst(BottomPlane, rayOrigin, rayDir);
+                float dstToTopPlane = rayYPlaneDst(_TopPlane, rayOrigin, rayDir);
+                float dstToBottomPlane = rayYPlaneDst(_BottomPlane, rayOrigin, rayDir);
 
-                float dstFront = min(dstToTopPlane, dstToBottomPlane);
-                float dstBack = min(max(dstToTopPlane, dstToBottomPlane), depth);
+                float dstFront = max(min(dstToTopPlane, dstToBottomPlane), 0);
+                float dstBack = max(dstToTopPlane, dstToBottomPlane);
 
-                if (dstBack > 0 && dstFront < depth) {
-                    dstFront = max(0.0f, dstFront);
-                    dstBack = min(depth, dstBack);
-                    float density = sampleDensity(rayOrigin + rayDir * dstFront, rayDir, dstBack - dstFront);
-                    float fog = exp(-FogFactor * density);
-                    col = 1 - fog + col * fog;
+                // Case when object is inside the cloud
+                if (!infiniteDepth)
+                    dstBack = min(dstBack, depthLinear);
+
+                // Draw if ray intersects with cloud
+                if (dstBack >= 0 && (dstFront <= depthLinear || infiniteDepth)) {                    
+                    float cloudRayLen = dstBack - dstFront;
+
+                    float3 pos = rayOrigin + rayDir * dstFront;
+                    pos += _DistortOffset * sampleDistortNoise(i.uv);
+
+                    float2 march = sampleDensity(pos, rayDir, cloudRayLen, lightDirection);
+                    fixed4 lightCol = lerp(1, _CloudDarkColor, 1/(_LightFactor * march.y + 1));
+                    col = saturate(col * march.x + lightCol * (1 - march.x));
+                    
+                    // add distance fog for far clouds
+                    float distFog = exp(-_DistanceFogFactor * cloudRayLen * 0.001);
+                    col = lerp(_DistFogColor, col, distFog);
                 }
                 return col;
             }

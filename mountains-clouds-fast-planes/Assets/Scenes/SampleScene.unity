@@ -1381,8 +1381,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shader: {fileID: 4800000, guid: 8b48c1e012d3045cf9b9ffdd3473681f, type: 3}
   container: {fileID: 1815980868}
-  scaleCloudTex: 0.002
-  fogFactor: 0.05
+  scaleLargeWorley: 0.0002
+  scaleSmallWorley: 0.001
+  fogFactor: 0.4
+  distanceFog: 1
+  minlightScatter: 0.2
+  maxlightScatter: 0.8
+  lightFactor: 0.3
+  distortOffset: 2
+  cloudThreshold: 0.2
+  smallNoiseFactor: 0.2
+  distanceFogColor: {r: 0.91224635, g: 0.9433962, b: 0.9433962, a: 1}
+  cloudDarkColor: {r: 0.46422216, g: 0.5033768, b: 0.6037736, a: 0}
+  fluidTexture: {fileID: 2800000, guid: 9841672da7e4947a49bf4176b3593f7b, type: 3}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1398,15 +1409,19 @@ MonoBehaviour:
   computeShader: {fileID: 7200000, guid: 59eb497f4284442f8bca3aa1ffa9a945, type: 3}
   texturesCombiner: {fileID: 7200000, guid: ed8303b6dc9764e7c97ec39b5c6d6c48, type: 3}
   largeCloudTexture: {fileID: 0}
+  prelinNoise: {fileID: 0}
+  perlinNoiseScale: 0.55
   smallCloudTexture: {fileID: 0}
   cloudTexture: {fileID: 0}
-  resolution: 256
-  smallCloudResolution: 32
-  largeTexturePointsNumber: 6
-  smallTexturePointsNumber: 5
-  largeCloudThreshold: 0.5
+  resolution: 128
+  largeTexturePointsNumber: 8
+  smallTexturePointsNumber: 16
+  largeCloudThreshold: 0.55
   smallCloudThreshold: 0.05
   smallCloudScale: 1
+  perlinNoiseFactor: 0.3
+  largeWorleyFactor: 0.5
+  smallWorleyFactor: 0.2
 --- !u!4 &964807758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 71fbc79ea5b9d4a8cad647f897de45fb,

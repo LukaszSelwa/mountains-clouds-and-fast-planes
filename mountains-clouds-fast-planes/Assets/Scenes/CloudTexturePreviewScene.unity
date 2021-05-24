@@ -223,16 +223,18 @@ MonoBehaviour:
   computeShader: {fileID: 7200000, guid: 59eb497f4284442f8bca3aa1ffa9a945, type: 3}
   texturesCombiner: {fileID: 7200000, guid: ed8303b6dc9764e7c97ec39b5c6d6c48, type: 3}
   largeCloudTexture: {fileID: 0}
+  prelinNoise: {fileID: 0}
+  perlinNoiseScale: 3
   smallCloudTexture: {fileID: 0}
   cloudTexture: {fileID: 0}
-  resolution: 256
-  smallCloudResolution: 32
+  resolution: 128
+  smallCloudResolution: 128
   largeTexturePointsNumber: 8
-  smallTexturePointsNumber: 4
+  smallTexturePointsNumber: 32
   largeCloudThreshold: 0.7
   smallCloudThreshold: 0.9
-  smallCloudScale: 2
-  combineFactor: 0.3
+  smallCloudScale: 1
+  perlinNoiseCombineFactor: 0.501
 --- !u!114 &1219818958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,7 +249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSlice: {fileID: 0}
   texture3DSlicer: {fileID: 7200000, guid: 56678231527d14ac394378a3350f71ed, type: 3}
-  Slice: 34.9
+  Slice: 36.8
   InverseTexture: 0
 --- !u!1 &1804754936
 GameObject:
