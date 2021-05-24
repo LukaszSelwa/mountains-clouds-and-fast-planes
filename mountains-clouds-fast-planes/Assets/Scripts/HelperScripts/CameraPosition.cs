@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraPosition : MonoBehaviour
 {
-    [Range(0.0f, 300.0f)]
+    [Range(0.0f, 2000.0f)]
     public float positionY;
     
     [Range(0.0f, 360)]
@@ -17,6 +17,6 @@ public class CameraPosition : MonoBehaviour
     void Update()
     {
         transform.position = new Vector3(350.0f, positionY, -20.0f);
-        transform.eulerAngles = new Vector3(rotationX, rotationY, 0);
+        transform.eulerAngles = new Vector3(rotationX + 180, rotationY, 0);
     }
 }

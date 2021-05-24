@@ -4,20 +4,29 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture3D<float4> SmallTexture;
+Texture3D<float4> PerlinNoise;
 RWTexture3D<float4> LargeTexture;
 RWTexture3D<float4> Result;
 
 uint SmallTextureResolution;
 float LargeThreshold;
-float SmallThreshold;
+float SmallThreshold; 
 float Scale;
+float LargeWorleyFactor;
+float PerlinFactor;
+float SmallWorleyFactor;
 
 [numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     float4 large = LargeTexture[id.xyz];
+    float4 perlin = PerlinNoise[id.xyz];
     float4 small = SmallTexture[uint3(id.xyz / Scale) % SmallTextureResolution];
-    large = max(0, large - LargeThreshold) / (1 - LargeThreshold);
+    float combined = (PerlinFactor*perlin + LargeWorleyFactor*large + SmallWorleyFactor*small);
+    combined = combined / (PerlinFactor+LargeWorleyFactor+SmallWorleyFactor);
+    large = max(0, combined - LargeThreshold) / (1 - LargeThreshold);
     small = max(0, small - SmallThreshold) / (1 - SmallThreshold);
-    Result[id.xyz] = large * small;
+
+
+    Result[id.xyz] = float4(large.r, combined, 0, 0);
 }
