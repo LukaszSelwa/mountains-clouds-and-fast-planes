@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PauseResume : MonoBehaviour
 {
-    bool isRunning = false;
+    bool isRunning = true;
 
     void Update()
     {
