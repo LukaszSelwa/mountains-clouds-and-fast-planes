@@ -12,6 +12,9 @@ public class PlaneController : MonoBehaviour
     public float pitchAcceleration;
     public float yawAcceleration;
     public float rollAcceleration;
+
+    public float minPropellerSpeed;
+    public float maxPropellerSpeed;
     
     public float throttle;
 
@@ -33,11 +36,15 @@ public class PlaneController : MonoBehaviour
     }
 
     private Rigidbody _rb;
+    private Transform _propTransform;
 
     private void Start()
     {
         // fetch the Rigidbody component
         _rb = GetComponent<Rigidbody>();
+        
+        // fetch the transform of the propeller
+        _propTransform = transform.Find("AirplaneModel").Find("fuselage02").Find("prop_tip01");
         
         // set the initial throttle
         throttle = 0.5f;
@@ -48,13 +55,21 @@ public class PlaneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var input = PlayerInput.getInput();
-        var direction = transform.forward;
+        ApplyInput(PlayerInput.getInput());
+        
+        // propeller animation
+        var propellerSpeed = (minPropellerSpeed + (maxPropellerSpeed - minPropellerSpeed) * throttle) * Time.deltaTime;
+        _propTransform.Rotate(0f, 0f, propellerSpeed);
+    }
+
+    private void ApplyInput(PlayerInput.Input input)
+    {
+        var ts = transform;
         var delta = Time.deltaTime;
 
-        var pitch = transform.right * (input.pitch * pitchAcceleration);
-        var roll = transform.forward * (input.roll * rollAcceleration);
-        var yaw = transform.up * (input.yaw * yawAcceleration);
+        var pitch = ts.right * (input.pitch * pitchAcceleration);
+        var roll = ts.forward * (input.roll * rollAcceleration);
+        var yaw = ts.up * (input.yaw * yawAcceleration);
 
         // apply the rotation
         _rb.AddTorque(pitch, ForceMode.Acceleration);
@@ -65,7 +80,7 @@ public class PlaneController : MonoBehaviour
         throttle = Mathf.Clamp(throttle + (input.acceleration * delta), 0f, 1f);
         
         // calculate the acceleration
-        var force = direction * (forwardAcceleration * throttle);
+        var force = ts.forward * (forwardAcceleration * throttle);
         _rb.AddForce(force, ForceMode.Acceleration);
     }
     
