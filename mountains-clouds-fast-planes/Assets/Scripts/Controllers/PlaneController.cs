@@ -20,7 +20,7 @@ public class PlaneController : MonoBehaviour
 
     public int maxHitPoints = 100;
     private int _currentHitPoints;
-    
+
     public int hitPoints
     {
         get => _currentHitPoints;
@@ -38,8 +38,12 @@ public class PlaneController : MonoBehaviour
     private Rigidbody _rb;
     private Transform _propTransform;
 
+    private PauseResume _pauseResume;
+
     private void Start()
     {
+        Application.targetFrameRate = 60;
+        
         // fetch the Rigidbody component
         _rb = GetComponent<Rigidbody>();
         
@@ -50,13 +54,18 @@ public class PlaneController : MonoBehaviour
         throttle = 0.5f;
         
         _currentHitPoints = maxHitPoints;
+        
+        _pauseResume = GameObject.Find("PauseGame").GetComponent<PauseResume>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        ApplyInput(PlayerInput.getInput());
-        
+        if (_pauseResume.IsRunning)
+        {
+            ApplyInput(PlayerInput.getInput());
+        }
+
         // propeller animation
         var propellerSpeed = (minPropellerSpeed + (maxPropellerSpeed - minPropellerSpeed) * throttle) * Time.deltaTime;
         _propTransform.Rotate(0f, 0f, propellerSpeed);

@@ -4,22 +4,30 @@ using UnityEngine;
 
 public class PauseResume : MonoBehaviour
 {
-    bool isRunning = true;
+    private bool _isRunning = true;
+    public bool IsRunning
+    {
+        get => _isRunning;
+
+        private set
+        {
+            _isRunning = value;
+            if (_isRunning)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
+    }
 
     void Update()
     {
         if (Input.GetKeyDown("space"))
         {
-            if (isRunning)
-            {
-                isRunning = false;
-                PauseGame();
-            }
-            else
-            {
-                ResumeGame();
-                isRunning = true;
-            }
+            IsRunning = !IsRunning;
         }
     }
 
