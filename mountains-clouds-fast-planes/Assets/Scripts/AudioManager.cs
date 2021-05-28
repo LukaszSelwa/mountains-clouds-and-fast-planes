@@ -2,46 +2,29 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public AudioSource AirplaneSound;
+    public AudioSource airplaneSound;
     
-    const float minVolume = 0.5F;
-    const float maxVolume = 1F;
-    const float deltaVolume = 0.02F;
-    const float minPitch = 1F;
-    const float maxPitch = 1.25F;
-    const float deltaPitch = 0.01F;
+    public float minVolume = 0.5F;
+    public float maxVolume = 1F;
+    public float minPitch = 1F;
+    public float maxPitch = 1.25F;
 
-    float volume = minVolume;
-    float pitch = minPitch;
+    private float Volume => minVolume + (maxVolume - minVolume) * _pc.throttle;
+    private float Pitch => minPitch + (maxPitch - minPitch) * _pc.throttle;
 
+    private PlaneController _pc;
 
     public void Start()
     {
-        AirplaneSound.volume = volume;
-        AirplaneSound.pitch = pitch;
-        AirplaneSound.Play();
+        _pc = GetComponentInParent<PlaneController>();
+        airplaneSound.volume = Volume;
+        airplaneSound.pitch = Pitch;
+        airplaneSound.Play();
     }
 
     public void Update()
     {
-        if (Input.GetKey("up"))
-        {
-            volume += deltaVolume;
-            pitch += deltaPitch;
-
-            pitch = Mathf.Min(pitch, maxPitch);
-            volume = Mathf.Min(volume, maxVolume);
-        }
-        else
-        {
-            volume -= deltaVolume;
-            pitch -= deltaPitch;
-
-            pitch = Mathf.Max(pitch, minPitch);
-            volume = Mathf.Max(volume, minVolume);
-        }
-
-        AirplaneSound.volume = volume;
-        AirplaneSound.pitch = pitch;
+        airplaneSound.volume = Volume;
+        airplaneSound.pitch = Pitch;
     }
 }
