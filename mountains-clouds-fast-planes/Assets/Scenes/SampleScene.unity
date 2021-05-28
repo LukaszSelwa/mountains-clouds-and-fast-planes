@@ -807,6 +807,36 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 33569a9728a1444b1afc3cba3fc858c2, type: 2}
+    - target: {fileID: -4327503609256500769, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6532815
+      objectReference: {fileID: 0}
+    - target: {fileID: -4327503609256500769, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.27059805
+      objectReference: {fileID: 0}
+    - target: {fileID: -4327503609256500769, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.6532815
+      objectReference: {fileID: 0}
+    - target: {fileID: -4327503609256500769, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.27059805
+      objectReference: {fileID: 0}
+    - target: {fileID: -4327503609256500769, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: -4327503609256500769, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 45
+      objectReference: {fileID: 0}
     - target: {fileID: -3977390254943326217, guid: 71fbc79ea5b9d4a8cad647f897de45fb,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -1179,6 +1209,8 @@ MonoBehaviour:
   pitchAcceleration: 2
   yawAcceleration: 1
   rollAcceleration: 2.5
+  minPropellerSpeed: 120
+  maxPropellerSpeed: 600
   throttle: 0
   maxHitPoints: 100
 --- !u!4 &856740254
