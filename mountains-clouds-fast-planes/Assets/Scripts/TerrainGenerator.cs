@@ -48,11 +48,10 @@ public class TerrainGenerator : MonoBehaviour
 
     Terrain createTerrain(Vector3 position)
     {
-        TerrainData td = new TerrainData();
-        td.size = new Vector3(terrainSize / 16F, 0, terrainSize / 16F);
-        td.heightmapResolution = resolution;
+        TerrainData td = Instantiate(terrainData);
         GameObject t = Terrain.CreateTerrainGameObject(td);
         t.transform.position = 1000 * position;
+        t.GetComponent<Terrain>().materialTemplate = Terrain.activeTerrain.materialTemplate;
         return t.GetComponent<Terrain>();
     }
     void Update()
@@ -69,7 +68,7 @@ public class TerrainGenerator : MonoBehaviour
             {
                 if(!grid.ContainsKey(new System.Tuple<int, int>(x+i, z+j)))
                 {
-                    grid.Add(new System.Tuple<int, int>(x+i, z+j), createTerrain(new Vector3(x+i, 0, z+j)));
+                    grid.Add(new System.Tuple<int, int>(x+i, z+j), createTerrain(new Vector3(x+i, -0.3F, z+j)));
                     //GenerateTerrainChained(); 
                     grid[new System.Tuple<int, int>(x+i, z+j)].terrainData.SetHeights(0,0,heightmap);
                     found = true;
