@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Threading;
 
 public class TerrainGenerator : MonoBehaviour
 {
@@ -22,7 +23,11 @@ public class TerrainGenerator : MonoBehaviour
     public float ndErosionRate = 0.1F;
     public int ndErosionDuration = 12;
 
+    Thread workingThread;
+    bool waitingForResult;
+    System.Tuple<int,int> resultCoordinates;
     Dictionary<System.Tuple<int,int>, Terrain> grid;
+    System.Random random;
 
 
     // Start is called before the first frame update
@@ -30,6 +35,7 @@ public class TerrainGenerator : MonoBehaviour
     {
         //Temporary, should be done elsewhere
         Random.InitState(seed);
+        random = new System.Random();
         grid = new Dictionary<System.Tuple<int, int>, Terrain>();
 
         resolution = terrainData.heightmapResolution;
@@ -38,7 +44,7 @@ public class TerrainGenerator : MonoBehaviour
         GenerateTerrainChained(); 
         terrainData.SetHeights(0, 0, heightmap);
         grid.Add(new System.Tuple<int, int>(0,0), Terrain.activeTerrain);
-        print(Terrain.activeTerrain.terrainData.heightmapScale);
+        waitingForResult = false;
     }
 
     float Sigmoid(float X)
@@ -56,29 +62,35 @@ public class TerrainGenerator : MonoBehaviour
     }
     void Update()
     {
+        if(waitingForResult)
+        {
+            if(!workingThread.IsAlive)
+            {
+                grid.Add(new System.Tuple<int, int>(resultCoordinates.Item1, resultCoordinates.Item2), createTerrain(new Vector3(resultCoordinates.Item1, -0.3F, resultCoordinates.Item2)));
+                grid[new System.Tuple<int, int>(resultCoordinates.Item1, resultCoordinates.Item2)].terrainData.SetHeights(0,0,heightmap);
+                waitingForResult = false;
+            }
+            return;
+        }
+
         GameObject Plane = GameObject.Find("PlayerPlane");
         int x = (int)System.Math.Floor(Plane.transform.position.x / terrainSize);
         int z = (int)System.Math.Floor(Plane.transform.position.z / terrainSize);
         int tileRange = 2;
 
-        bool found = false;
         for(int i=-tileRange;i<=tileRange;i++)
         {
             for(int j=-(tileRange - System.Math.Abs(i));j <= tileRange - System.Math.Abs(i);j++)
             {
                 if(!grid.ContainsKey(new System.Tuple<int, int>(x+i, z+j)))
                 {
-                    grid.Add(new System.Tuple<int, int>(x+i, z+j), createTerrain(new Vector3(x+i, -0.3F, z+j)));
-                    //GenerateTerrainChained(); 
-                    grid[new System.Tuple<int, int>(x+i, z+j)].terrainData.SetHeights(0,0,heightmap);
-                    found = true;
-                    //print(grid[new System.Tuple<int, int>(x+i, z+j)].terrainData.heightmapScale);
-                    break;
+                    resultCoordinates = new System.Tuple<int, int>(x+i, z+j);
+                    workingThread = new Thread(GenerateTerrainChained);
+                    workingThread.Start();
+                    waitingForResult = true;
+                    return;
                 }
             }
-
-            if(found)
-                break;
         }
     }
 
@@ -127,7 +139,6 @@ public class TerrainGenerator : MonoBehaviour
                 hm[i,j] = Random.Range(-1.0F, 1.0F);
         }
 
-        print(hm.GetLength(0) + " " + hm.GetLength(1));
         t.terrainData.SetHeights(0, 0, hm);
         if(t.bottomNeighbor != null)
         {
@@ -154,13 +165,8 @@ public class TerrainGenerator : MonoBehaviour
     void ScaleHeightmap(float neutral, float factor)
     {
         for (int i = 0; i < resolution; i++)
-        {
             for (int j = 0; j < resolution; j++)
-            {
                 heightmap[i,j] = ((heightmap[i,j] - neutral) * factor) + neutral;
-                //heightmap[i,j] = ((heightmap[i,j] - neutral) * factor) + neutral;
-            }
-        }
     }
 
     void GenerateTerrainChained()
@@ -179,8 +185,7 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
 
-        var R = new System.Random();
-        var randomOrder = list.OrderBy(x => R.Next()).ToList();
+        var randomOrder = list.OrderBy(x => random.Next()).ToList();
 
         foreach(System.Tuple<int,int> p in randomOrder)
         {
@@ -188,9 +193,9 @@ public class TerrainGenerator : MonoBehaviour
                 int j = p.Item2;
                 if(System.Math.Abs(heightmap[i, j] - 0.5F) > 0.01F) 
                 {
-                    for(int k=i;k<resolution && k < i+3;k++)
+                    for(int k=i;k<resolution && k < i+5;k++)
                     {
-                        for(int l=j;l<resolution && l < j+3;l++)
+                        for(int l=j;l<resolution && l < j+5;l++)
                         {
                             if(System.Math.Abs(heightmap[k, l] - 0.5F) < 0.01F)
                                 heightmap[k, l] = heightmap[i, j];
@@ -206,7 +211,10 @@ public class TerrainGenerator : MonoBehaviour
         for (int i = 0; i < resolution; i++)
         {
             for (int j = 0; j < resolution; j++)
-                heightmap[i,j] += Random.Range(-roughness, roughness);
+            {
+                //heightmap[i,j] += Random.Range(-roughness, roughness);
+                heightmap[i,j] += (float)random.NextDouble()*roughness;
+            }
         }
 
         Erode(ndErosionRate, ndErosionDuration);
@@ -217,8 +225,10 @@ public class TerrainGenerator : MonoBehaviour
     {
         for (int i = 0; i < chains; i++)
         {
-            int r_x = Random.Range(0, resolution-1);
-            int r_y = Random.Range(0, resolution-1);
+            //int r_x = Random.Range(0, resolution-1);
+            //int r_y = Random.Range(0, resolution-1);
+            int r_x = random.Next(resolution);
+            int r_y = random.Next(resolution);
             AddChainedPoint(r_x, r_y, lowH, highH, chainDist, chainingRate, changeRate);
         }
     }
@@ -278,33 +288,36 @@ public class TerrainGenerator : MonoBehaviour
         return !(x<0 || x >= resolution || y < 0 || y >= resolution);
     }
 
-    void AddRandomPoints(int num, float rangeLow, float rangeHigh)
+    Vector2 randInUnitCircle()
     {
-        for(int k = 0; k<num; k++)
-        {
-            int i = Random.Range(0, resolution);
-            int j = Random.Range(0, resolution);
-            heightmap[i,j] = Random.Range(rangeLow, rangeHigh);
-        }
+        Vector2 res = new Vector2();
+        do {
+            res.x = (float)random.NextDouble();
+            res.y = (float)random.NextDouble();
+        } while(res.magnitude > 1.0F);
+        return res;
     }
 
     void AddChainedPoint(int x, int y, float rangeLow, float rangeHigh, int chainDist, float chainProb, float levelChange)
     {
-        float heightChange = Random.Range(rangeLow, rangeHigh);
+        //float heightChange = Random.Range(rangeLow, rangeHigh);
+        float heightChange = (float)random.NextDouble()*(rangeHigh-rangeLow)+rangeLow;
         heightmap[x, y] = heightmap[x,y] + (1.0F - 2.0F*System.Math.Abs(heightmap[x,y])) * heightChange;
-        //heightmap[x, y] = heightChange;
-        //heightmap[x, y] = System.Math.Abs(heightChange) < System.Math.Abs(heightmap[x,y]) ? heightChange : heightmap[x, y];
-        var positionChange = Random.insideUnitCircle * chainDist;
+        
+        var positionChange = randInUnitCircle() * chainDist;
 
         int x_new = x + (int)positionChange.x;
         int y_new = y + (int)positionChange.y;
+        //int x_new = x + (int)(random.NextDouble()*chainDist);
+        //int y_new = y + (int)(random.NextDouble()*chainDist);
 
         x_new = (x_new + resolution) % resolution;
         y_new = (y_new + resolution) % resolution;
 
-        float lc = Random.Range(-levelChange, levelChange);
+        //float lc = Random.Range(-levelChange, levelChange);
+        float lc = 2.0F*((float)random.NextDouble()-0.5F)*levelChange;
 
-        if (Random.Range(0.0F, 1.0F) < chainProb)
+        if (random.NextDouble() < chainProb)
             AddChainedPoint(x_new, y_new, heightChange - lc, heightChange + lc, chainDist, chainProb, levelChange);
     }
 }
