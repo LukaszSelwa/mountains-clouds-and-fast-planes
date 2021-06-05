@@ -1848,7 +1848,7 @@ MonoBehaviour:
   scale: 3
   roughness: 0.01
   stErosionRate: 0.8
-  stErosionDuration: 5
+  stErosionDuration: 15
   ndErosionRate: 0.4
   ndErosionDuration: 2
 --- !u!1 &1490114241 stripped

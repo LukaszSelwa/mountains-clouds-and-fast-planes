@@ -29,7 +29,6 @@ public class TerrainGenerator : MonoBehaviour
     Dictionary<System.Tuple<int,int>, Terrain> grid;
     System.Random random;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -101,10 +100,8 @@ public class TerrainGenerator : MonoBehaviour
         return !(pos.z < corner.z || pos.z > corner.z + side);
     }
 
-    void Clamp(Terrain t)
+    /*void Clamp()
     {
-        print(t.terrainData.heightmapResolution);
-        float[,] hm = t.terrainData.GetHeights(0, 0, resolution, resolution);
         if(t.rightNeighbor != null)
         {
             float[,] tp = t.rightNeighbor.terrainData.GetHeights(0, 0, resolution, resolution);
@@ -133,13 +130,6 @@ public class TerrainGenerator : MonoBehaviour
                 hm[resolution-1, i] = tp[0, i];
         }
 
-        for(int i=0;i<resolution;i++)
-        {
-            for(int j=0;j<resolution;j++)
-                hm[i,j] = Random.Range(-1.0F, 1.0F);
-        }
-
-        t.terrainData.SetHeights(0, 0, hm);
         if(t.bottomNeighbor != null)
         {
             float[,] tp = t.terrainData.GetHeights(0, 0, resolution, resolution);
@@ -148,18 +138,13 @@ public class TerrainGenerator : MonoBehaviour
                 print(hm[resolution-1, i] + " " + tp[resolution-1, i]);
             }
         }
-    }
+    }*/
 
     void PutInRange()
     {
         for (int i = 0; i < resolution; i++)
-        {
             for (int j = 0; j < resolution; j++)
-            {
-                //heightmap[i,j] = (float)System.Math.Tanh(heightmap[i,j]);
                 heightmap[i,j] = Sigmoid(heightmap[i,j]);
-            }
-        }
     }
 
     void ScaleHeightmap(float neutral, float factor)
@@ -172,6 +157,7 @@ public class TerrainGenerator : MonoBehaviour
     void GenerateTerrainChained()
     {
         SetNeutralHeight(0.0F);
+        //Clamp();
         GenerateChains(chainNumber, chainProbability, 0.01F, chainSparsity, -0.005F, 0.02F);
         
         PutInRange();
@@ -209,13 +195,8 @@ public class TerrainGenerator : MonoBehaviour
         ScaleHeightmap(0.5F, scale);
 
         for (int i = 0; i < resolution; i++)
-        {
             for (int j = 0; j < resolution; j++)
-            {
-                //heightmap[i,j] += Random.Range(-roughness, roughness);
                 heightmap[i,j] += (float)random.NextDouble()*roughness;
-            }
-        }
 
         Erode(ndErosionRate, ndErosionDuration);
     }
@@ -225,8 +206,6 @@ public class TerrainGenerator : MonoBehaviour
     {
         for (int i = 0; i < chains; i++)
         {
-            //int r_x = Random.Range(0, resolution-1);
-            //int r_y = Random.Range(0, resolution-1);
             int r_x = random.Next(resolution);
             int r_y = random.Next(resolution);
             AddChainedPoint(r_x, r_y, lowH, highH, chainDist, chainingRate, changeRate);
@@ -292,15 +271,14 @@ public class TerrainGenerator : MonoBehaviour
     {
         Vector2 res = new Vector2();
         do {
-            res.x = (float)random.NextDouble();
-            res.y = (float)random.NextDouble();
+            res.x = (float)random.NextDouble() - 0.5F;
+            res.y = (float)random.NextDouble() - 0.5F;
         } while(res.magnitude > 1.0F);
         return res;
     }
 
     void AddChainedPoint(int x, int y, float rangeLow, float rangeHigh, int chainDist, float chainProb, float levelChange)
     {
-        //float heightChange = Random.Range(rangeLow, rangeHigh);
         float heightChange = (float)random.NextDouble()*(rangeHigh-rangeLow)+rangeLow;
         heightmap[x, y] = heightmap[x,y] + (1.0F - 2.0F*System.Math.Abs(heightmap[x,y])) * heightChange;
         
@@ -308,13 +286,10 @@ public class TerrainGenerator : MonoBehaviour
 
         int x_new = x + (int)positionChange.x;
         int y_new = y + (int)positionChange.y;
-        //int x_new = x + (int)(random.NextDouble()*chainDist);
-        //int y_new = y + (int)(random.NextDouble()*chainDist);
 
         x_new = (x_new + resolution) % resolution;
         y_new = (y_new + resolution) % resolution;
 
-        //float lc = Random.Range(-levelChange, levelChange);
         float lc = 2.0F*((float)random.NextDouble()-0.5F)*levelChange;
 
         if (random.NextDouble() < chainProb)
