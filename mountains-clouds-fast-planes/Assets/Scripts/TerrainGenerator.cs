@@ -32,9 +32,7 @@ public class TerrainGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Temporary, should be done elsewhere
-        Random.InitState(seed);
-        random = new System.Random();
+        random = new System.Random(Random.Range(0, int.MaxValue));
         grid = new Dictionary<System.Tuple<int, int>, Terrain>();
 
         resolution = terrainData.heightmapResolution;
