@@ -42,6 +42,12 @@ public class TerrainGenerator : MonoBehaviour
         terrainData.SetHeights(0, 0, heightmap);
         grid.Add(new System.Tuple<int, int>(0,0), Terrain.activeTerrain);
         waitingForResult = false;
+
+        // Update plane height
+        GameObject Plane = GameObject.Find("PlayerPlane");
+        float H = TerrainHeightChecker.getHeight(new Vector2(Plane.transform.position.x, Plane.transform.position.z));
+        print(H + " " + Plane.transform.position.y);
+        Plane.transform.position = new Vector3(Plane.transform.position.x, H + 80, Plane.transform.position.z);
     }
 
     float Sigmoid(float X)
@@ -89,13 +95,6 @@ public class TerrainGenerator : MonoBehaviour
                 }
             }
         }
-    }
-
-    bool inSquare(Vector3 pos, Vector3 corner, int side)
-    {
-        if(pos.x < corner.x || pos.x > corner.x + side)
-            return false;
-        return !(pos.z < corner.z || pos.z > corner.z + side);
     }
 
     /*void Clamp()
