@@ -61,14 +61,17 @@ public class PlaneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // propeller animation
+        var propellerSpeed = (minPropellerSpeed + (maxPropellerSpeed - minPropellerSpeed) * throttle) * Time.deltaTime;
+        _propTransform.Rotate(0f, 0f, propellerSpeed);
+    }
+
+    private void FixedUpdate()
+    {
         if (_pauseResume.IsRunning)
         {
             ApplyInput(PlayerInput.getInput());
         }
-
-        // propeller animation
-        var propellerSpeed = (minPropellerSpeed + (maxPropellerSpeed - minPropellerSpeed) * throttle) * Time.deltaTime;
-        _propTransform.Rotate(0f, 0f, propellerSpeed);
     }
 
     private void ApplyInput(PlayerInput.Input input)
