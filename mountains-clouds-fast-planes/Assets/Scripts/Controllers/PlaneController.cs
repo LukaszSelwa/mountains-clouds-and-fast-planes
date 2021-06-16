@@ -35,7 +35,7 @@ public class PlaneController : MonoBehaviour
         }
     }
 
-    private Rigidbody _rb;
+    public Rigidbody rb;
     private Transform _propTransform;
 
     private PauseResume _pauseResume;
@@ -45,7 +45,7 @@ public class PlaneController : MonoBehaviour
         Application.targetFrameRate = 60;
         
         // fetch the Rigidbody component
-        _rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         
         // fetch the transform of the propeller
         _propTransform = transform.Find("AirplaneModel").Find("fuselage02").Find("prop_tip01");
@@ -63,7 +63,7 @@ public class PlaneController : MonoBehaviour
     {
         // propeller animation
         var propellerSpeed = (minPropellerSpeed + (maxPropellerSpeed - minPropellerSpeed) * throttle) * Time.deltaTime;
-        _propTransform.Rotate(0f, 0f, propellerSpeed);
+        _propTransform.Rotate(0f, 0f, 2.3f*propellerSpeed);
     }
 
     private void FixedUpdate()
@@ -84,16 +84,16 @@ public class PlaneController : MonoBehaviour
         var yaw = ts.up * (input.yaw * yawAcceleration);
 
         // apply the rotation
-        _rb.AddTorque(pitch, ForceMode.Acceleration);
-        _rb.AddTorque(roll, ForceMode.Acceleration);
-        _rb.AddTorque(yaw, ForceMode.Acceleration);
+        rb.AddTorque(pitch, ForceMode.Acceleration);
+        rb.AddTorque(roll, ForceMode.Acceleration);
+        rb.AddTorque(yaw, ForceMode.Acceleration);
         
         // update the throttle with input
         throttle = Mathf.Clamp(throttle + (input.acceleration * delta), 0f, 1f);
         
         // calculate the acceleration
         var force = ts.forward * (forwardAcceleration * throttle);
-        _rb.AddForce(force, ForceMode.Acceleration);
+        rb.AddForce(force, ForceMode.Acceleration);
     }
     
     private void OnCollisionEnter(Collision collision)
