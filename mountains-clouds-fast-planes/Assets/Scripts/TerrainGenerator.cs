@@ -23,11 +23,13 @@ public class TerrainGenerator : MonoBehaviour
     public float ndErosionRate = 0.1F;
     public int ndErosionDuration = 12;
 
+
     Thread workingThread;
     bool waitingForResult;
     System.Tuple<int,int> resultCoordinates;
     Dictionary<System.Tuple<int,int>, Terrain> grid;
     System.Random random;
+    int hasLeftN, hasRightN, hasTopN, hasBotN;
 
     // Start is called before the first frame update
     void Start()
@@ -38,6 +40,8 @@ public class TerrainGenerator : MonoBehaviour
         resolution = terrainData.heightmapResolution;
         heightmap = terrainData.GetHeights(0, 0, resolution, resolution);
 
+        hasLeftN = hasRightN = hasBotN = hasTopN = 0;
+        SetNeutralHeight(0.0F);
         GenerateTerrainChained(); 
         terrainData.SetHeights(0, 0, heightmap);
         grid.Add(new System.Tuple<int, int>(0,0), Terrain.activeTerrain);
@@ -46,7 +50,6 @@ public class TerrainGenerator : MonoBehaviour
         // Update plane height
         GameObject Plane = GameObject.Find("PlayerPlane");
         float H = TerrainHeightChecker.getHeight(new Vector2(Plane.transform.position.x, Plane.transform.position.z));
-        print(H + " " + Plane.transform.position.y);
         Plane.transform.position = new Vector3(Plane.transform.position.x, H + 80, Plane.transform.position.z);
     }
 
@@ -79,90 +82,92 @@ public class TerrainGenerator : MonoBehaviour
         GameObject Plane = GameObject.Find("PlayerPlane");
         int x = (int)System.Math.Floor(Plane.transform.position.x / terrainSize);
         int z = (int)System.Math.Floor(Plane.transform.position.z / terrainSize);
-        int tileRange = 2;
-
-        for(int i=-tileRange;i<=tileRange;i++)
+        
+        for(int tileRange = 1;tileRange<=2;tileRange++)
         {
-            for(int j=-(tileRange - System.Math.Abs(i));j <= tileRange - System.Math.Abs(i);j++)
+            for(int i=-tileRange;i<=tileRange;i++)
             {
-                if(!grid.ContainsKey(new System.Tuple<int, int>(x+i, z+j)))
+                for(int j=-(tileRange - System.Math.Abs(i));j <= tileRange - System.Math.Abs(i);j++)
                 {
-                    resultCoordinates = new System.Tuple<int, int>(x+i, z+j);
-                    workingThread = new Thread(GenerateTerrainChained);
-                    workingThread.Start();
-                    waitingForResult = true;
-                    return;
+                    if(!grid.ContainsKey(new System.Tuple<int, int>(x+i, z+j)))
+                    {
+                        resultCoordinates = new System.Tuple<int, int>(x+i, z+j);
+                        SetNeutralHeight(0.0F);
+                        Clamp();
+                        workingThread = new Thread(GenerateTerrainChained);
+                        workingThread.Start();
+                        waitingForResult = true;
+                        return;
+                    }
                 }
             }
         }
     }
 
-    /*void Clamp()
+    void Clamp()
     {
-        if(t.rightNeighbor != null)
+        int x = resultCoordinates.Item1;
+        int y = resultCoordinates.Item2;
+
+        hasLeftN = hasRightN = hasTopN = hasBotN = 0;
+
+        if(grid.ContainsKey(new System.Tuple<int, int>(x-1, y)))
         {
-            float[,] tp = t.rightNeighbor.terrainData.GetHeights(0, 0, resolution, resolution);
+            hasLeftN = 1;
+            float[,] tp = grid[new System.Tuple<int, int>(x-1, y)].terrainData.GetHeights(0,0,resolution,resolution);
             for(int i=0;i<resolution;i++)
-                hm[i, resolution-1] = tp[i, 0];
+                heightmap[i, 0] = tp[i, resolution-1];
         }
 
-        if(t.leftNeighbor != null)
+        if(grid.ContainsKey(new System.Tuple<int, int>(x+1, y)))
         {
-            float[,] tp = t.leftNeighbor.terrainData.GetHeights(0, 0, resolution, resolution);
+            hasRightN = 1;
+            float[,] tp = grid[new System.Tuple<int, int>(x+1, y)].terrainData.GetHeights(0,0,resolution,resolution);
             for(int i=0;i<resolution;i++)
-                hm[i, 0] = tp[i, resolution-1];
+                heightmap[i, resolution-1] = tp[i, 0];
         }
 
-        if(t.topNeighbor != null)
+        if(grid.ContainsKey(new System.Tuple<int, int>(x, y-1)))
         {
-            float[,] tp = t.topNeighbor.terrainData.GetHeights(0, 0, resolution, resolution);
+            hasTopN = 1;
+            float[,] tp = grid[new System.Tuple<int, int>(x, y-1)].terrainData.GetHeights(0,0,resolution,resolution);
             for(int i=0;i<resolution;i++)
-                hm[0, i] = tp[resolution-1, i];
+                heightmap[0, i] = tp[resolution-1, i];
         }
 
-        if(t.bottomNeighbor != null)
+        if(grid.ContainsKey(new System.Tuple<int, int>(x, y+1)))
         {
-            float[,] tp = t.bottomNeighbor.terrainData.GetHeights(0, 0, resolution, resolution);
+            hasBotN = 1;
+            float[,] tp = grid[new System.Tuple<int, int>(x, y+1)].terrainData.GetHeights(0,0,resolution,resolution);
             for(int i=0;i<resolution;i++)
-                hm[resolution-1, i] = tp[0, i];
+                heightmap[resolution-1, i] = tp[0, i];
         }
-
-        if(t.bottomNeighbor != null)
-        {
-            float[,] tp = t.terrainData.GetHeights(0, 0, resolution, resolution);
-            for(int i=0;i<resolution;i++)
-            {
-                print(hm[resolution-1, i] + " " + tp[resolution-1, i]);
-            }
-        }
-    }*/
+    }
 
     void PutInRange()
     {
-        for (int i = 0; i < resolution; i++)
-            for (int j = 0; j < resolution; j++)
+        for (int i = hasTopN; i < resolution - hasBotN; i++)
+            for (int j = hasLeftN; j < resolution - hasRightN; j++)
                 heightmap[i,j] = Sigmoid(heightmap[i,j]);
     }
 
     void ScaleHeightmap(float neutral, float factor)
     {
-        for (int i = 0; i < resolution; i++)
-            for (int j = 0; j < resolution; j++)
+        for (int i = hasTopN; i < resolution - hasBotN; i++)
+            for (int j = hasLeftN; j < resolution - hasRightN; j++)
                 heightmap[i,j] = ((heightmap[i,j] - neutral) * factor) + neutral;
     }
 
     void GenerateTerrainChained()
     {
-        SetNeutralHeight(0.0F);
-        //Clamp();
         GenerateChains(chainNumber, chainProbability, 0.01F, chainSparsity, -0.005F, 0.02F);
         
         PutInRange();
 
         var list = new List<System.Tuple<int,int>>();
-        for(int i = 0;i<resolution;i++)
+        for(int i = 1;i<resolution;i++)
         {
-            for(int j = 0;j<resolution;j++)
+            for(int j = 1;j<resolution;j++)
             {
                 list.Add(new System.Tuple<int, int>(i,j));
             }
@@ -176,9 +181,9 @@ public class TerrainGenerator : MonoBehaviour
                 int j = p.Item2;
                 if(System.Math.Abs(heightmap[i, j] - 0.5F) > 0.01F) 
                 {
-                    for(int k=i;k<resolution && k < i+5;k++)
+                    for(int k=i;k<resolution-1 && k < i+5;k++)
                     {
-                        for(int l=j;l<resolution && l < j+5;l++)
+                        for(int l=j;l<resolution-1 && l < j+5;l++)
                         {
                             if(System.Math.Abs(heightmap[k, l] - 0.5F) < 0.01F)
                                 heightmap[k, l] = heightmap[i, j];
@@ -186,14 +191,12 @@ public class TerrainGenerator : MonoBehaviour
                     }
                 }
         }
-
-        Erode(stErosionRate, stErosionDuration);
-        
         ScaleHeightmap(0.5F, scale);
+        Erode(stErosionRate, stErosionDuration);
 
-        for (int i = 0; i < resolution; i++)
-            for (int j = 0; j < resolution; j++)
-                heightmap[i,j] += (float)random.NextDouble()*roughness;
+        for (int i = hasTopN; i < resolution - hasBotN; i++)
+            for (int j = hasLeftN; j < resolution - hasRightN; j++)
+                heightmap[i,j] += ((float)random.NextDouble()-0.5F)*roughness;
 
         Erode(ndErosionRate, ndErosionDuration);
     }
@@ -220,9 +223,9 @@ public class TerrainGenerator : MonoBehaviour
     {
         for (int k = 0; k < epochs; k++)
         {
-            for (int i = 0; i < resolution; i++)
+            for (int i = hasTopN; i < resolution - hasBotN; i++)
             {
-                for (int j = 0; j < resolution; j++)
+                for (int j = hasLeftN; j < resolution - hasRightN; j++)
                 {
                     float sum = 0.0F;
                     int num = 0;
@@ -277,6 +280,16 @@ public class TerrainGenerator : MonoBehaviour
     void AddChainedPoint(int x, int y, float rangeLow, float rangeHigh, int chainDist, float chainProb, float levelChange)
     {
         float heightChange = (float)random.NextDouble()*(rangeHigh-rangeLow)+rangeLow;
+
+        if(x <= 0)
+            return;
+        if(x >= resolution-1)
+            return;
+        if(y <= 0)
+            return;
+        if(y >= resolution-1)
+            return;
+
         heightmap[x, y] = heightmap[x,y] + (1.0F - 2.0F*System.Math.Abs(heightmap[x,y])) * heightChange;
         
         var positionChange = randInUnitCircle() * chainDist;
