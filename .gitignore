@@ -73,3 +73,6 @@ crashlytics-build.properties
 .DS_Store
 mountains-clouds-fast-planes/.DS_Store
 mountains-clouds-fast-planes/.vsconfig
+
+# Auto-generated terrain data
+mountains-clouds-fast-planes/Assets/TerrainData*
