@@ -7,26 +7,30 @@ public class UIHandler : MonoBehaviour
 {
     public UIDocument UIDocument;
 
-    private GameObject obiektGry;
-    private PlaneController pc;
+    private GameObject playerPlane;
+    private PlaneController planeControler;
 
-    private Label label;
+    private Label speedLabel;
+    private Label damageLabel;
 
     void Start()
     {
         var root = UIDocument.rootVisualElement;
         // get ui elements by name
-        label = root.Q<Label>("Speed");
-        obiektGry = GameObject.Find("PlayerPlane");
-        pc = obiektGry.GetComponent<PlaneController>();
-       
+        speedLabel = root.Q<Label>("Speed");
+        damageLabel = root.Q<Label>("Damage");
+        playerPlane = GameObject.Find("PlayerPlane");
+        planeControler = playerPlane.GetComponent<PlaneController>();
     }
 
 
     private void Update()
     {
-        int speed = (int)pc.rb.velocity.magnitude*3;
-        label.text = speed.ToString()+" mph";
+        int speed = (int)planeControler.rb.velocity.magnitude * 3;
+        speedLabel.text = $"Speed: {speed}mph";
+
+        int dmg = (planeControler.maxHitPoints-planeControler.hitPoints) * 100 / planeControler.maxHitPoints;
+        damageLabel.text = $"Damage: {dmg}%";
     }
 
 }

@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Label text="Label" display-tooltip-when-elided="true" name="Speed" style="left: 1%; top: 90%; font-size: 60%; color: rgb(255, 255, 255); position: absolute; -unity-font-style: bold; width: 100%; height: 5%;" />
-    <ui:Label text="Label" display-tooltip-when-elided="true" name="Score" style="position: absolute; left: 1%; top: 0; font-size: 60%; color: rgb(255, 255, 255); -unity-font-style: bold; width: 100%; height: 5%;" />
+    <ui:Label text="Your score: 0" display-tooltip-when-elided="true" name="Score" style="position: absolute; left: 1%; top: 0; font-size: 30%; color: rgb(255, 255, 255); -unity-font-style: bold; width: 100%; height: 5%;" />
+    <ui:Label text="Speed: 100mph" display-tooltip-when-elided="true" name="Speed" style="left: 1%; top: 93%; font-size: 30%; color: rgb(255, 255, 255); position: absolute; -unity-font-style: bold; width: 100%; height: 5%;" />
+    <ui:Label text="Damage: 100%" display-tooltip-when-elided="true" name="Damage" style="left: 1%; top: 88%; font-size: 30%; color: rgb(255, 255, 255); position: absolute; -unity-font-style: bold; width: 100%; height: 5%; right: auto;" />
 </ui:UXML>
