@@ -4,7 +4,7 @@ wantsMore = false
 keepOpen = false
 itemIconSize = 1
 queryFolder = "Assets"
-onBoardingDoNotAskAgain = false
+onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
@@ -15,7 +15,7 @@ scopes = {
 	"settings.785D90A9" = "True"
 	"m_ShownPanels.785D90A9" = "3"
 	"m_SideBarSplitter.785D90A9" = "180"
-	"m_DetailsPanelSplitter.785D90A9" = "700"
+	"m_DetailsPanelSplitter.785D90A9" = "699"
 	"currentGroup.785D90A9" = "all"
 }
 providers = {

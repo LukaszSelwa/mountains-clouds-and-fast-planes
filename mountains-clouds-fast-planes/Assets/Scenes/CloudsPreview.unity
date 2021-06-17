@@ -312,8 +312,8 @@ GameObject:
   - component: {fileID: 1994044535}
   - component: {fileID: 1994044534}
   - component: {fileID: 1994044533}
-  - component: {fileID: 1994044536}
   - component: {fileID: 1994044537}
+  - component: {fileID: 1994044536}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -395,26 +395,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1994044532}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a35dd7e59de7a4f88b7f1cc300c7565b, type: 3}
+  m_Script: {fileID: 11500000, guid: 7434d4a3c872f45e085e5c54c0c470a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shader: {fileID: 4800000, guid: 8b48c1e012d3045cf9b9ffdd3473681f, type: 3}
-  container: {fileID: 1373225678}
-  scaleLargeWorley: 0.0002
-  scaleSmallWorley: 0.001
+  shader: {fileID: 0}
+  container: {fileID: 0}
+  scaleLargeWorley: 0
+  scaleSmallWorley: 0
   scaleTinyWorley: 0
-  fogFactor: 0.4
-  distanceFog: 1.02
-  minlightScatter: 0.2
-  maxlightScatter: 0.8
-  lightFactor: 0.3
-  distortOffset: 2
-  cloudThreshold: 0.13
-  smallNoiseFactor: 0.181
+  fogFactor: 0
+  distanceFog: 0
+  minLightScatter: 0
+  maxLightScatter: 0
+  lightFactor: 0
+  distortOffset: 0
+  cloudThreshold: 0
+  smallNoiseFactor: 0
   tinyNoiseFactor: 0
-  distanceFogColor: {r: 0.8407796, g: 0.88520575, b: 0.8867924, a: 1}
-  cloudDarkColor: {r: 0.4174528, g: 0.47600713, b: 0.5, a: 1}
-  fluidTexture: {fileID: 2800000, guid: 9841672da7e4947a49bf4176b3593f7b, type: 3}
+  distanceFogColor: {r: 0, g: 0, b: 0, a: 0}
+  cloudDarkColor: {r: 0, g: 0, b: 0, a: 0}
+  fluidTexture: {fileID: 0}
 --- !u!114 &1994044537
 MonoBehaviour:
   m_ObjectHideFlags: 0
