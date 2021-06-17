@@ -57,11 +57,13 @@ Shader "Hidden/ImageCloudsShader"
             sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
             
-            Texture3D<float4> _NoiseTex;
+            //Texture3D<float4> _NoiseTex;
             Texture2D<float4> _FluidTex;
+            sampler3D _NoiseTex;
+            float4 _NoiseTex_ST;
 
             // samplers
-            SamplerState my_linear_repeat_sampler;
+            SamplerState noise_linear_repeat_sampler;
             SamplerState fluid_linear_repeat_sampler;
             
             // Planes constants
@@ -89,10 +91,13 @@ Shader "Hidden/ImageCloudsShader"
 
             float _DistanceFogFactor;
 
-            float sampleCloudNoise(float3 pos) {
-                float large = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleLargeWorley).r;
-                float small = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleSmallWorley).g;
-                float tiny  = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleTinyWorley).b;
+            float sampleCloudNoise(float4 pos) {
+                // float large = _NoiseTex.Sample(noise_linear_repeat_sampler, pos * _ScaleLargeWorley).r;
+                // float small = _NoiseTex.Sample(noise_linear_repeat_sampler, pos * _ScaleSmallWorley).g;
+                // float tiny  = _NoiseTex.Sample(noise_linear_repeat_sampler, pos * _ScaleTinyWorley).b;
+                float large = tex3Dlod(_NoiseTex, pos * _ScaleLargeWorley).r;
+                float small = tex3Dlod(_NoiseTex, pos * _ScaleSmallWorley).g;
+                float tiny  = tex3Dlod(_NoiseTex, pos * _ScaleTinyWorley).b;
 
                 small = lerp(small, tiny, _TinyNoiseFactor);
                 float sample = lerp(large, small, _SmallNoiseFactor);
@@ -107,11 +112,11 @@ Shader "Hidden/ImageCloudsShader"
                 return sample;
             }
 
-            float sampleLight(float3 pos, float3 lightDir) {
+            float sampleLight(float4 pos, float4 lightDir) {
                 float dstToTopPlane = rayYPlaneDst(_TopPlane, pos, -lightDir);
                 float density = 0.0;
                 float step = dstToTopPlane / LIGHT_SAMPLES;
-                for (int i = 0; i < LIGHT_SAMPLES; ++i) {
+                for (int i = 0; i < LIGHT_SAMPLES; ++i) { 
                     density += sampleCloudNoise(pos);
                     pos += -step * lightDir;
                 }
@@ -124,7 +129,7 @@ Shader "Hidden/ImageCloudsShader"
                 return _FluidTex.Sample(fluid_linear_repeat_sampler, pos);
             } 
 
-            float2 sampleDensity(float3 pos, float3 rayDir, float distance, float3 lightDir) {
+            float2 sampleDensity(float4 pos, float4 rayDir, float distance, float4 lightDir) {
                 float density = 0.0;
                 float sample;
                 float step = distance / MAX_STEP_COUNT;
@@ -173,9 +178,9 @@ Shader "Hidden/ImageCloudsShader"
                     float cloudRayLen = dstBack - dstFront;
 
                     float3 pos = rayOrigin + rayDir * dstFront;
-                    pos += _DistortOffset * sampleDistortNoise(i.uv);
+                    pos += _DistortOffset * sampleDistortNoise(i.uv); 
 
-                    float2 march = sampleDensity(pos, rayDir, cloudRayLen, lightDirection);
+                    float2 march = sampleDensity(float4(pos, 0), float4(rayDir, 0), cloudRayLen, float4(lightDirection, 0));
                     fixed4 lightCol = lerp(1, _CloudDarkColor, 1/(_LightFactor * march.y + 1));
                     col = saturate(col * march.x + lightCol * (1 - march.x));
                     
