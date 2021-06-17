@@ -35,6 +35,7 @@ public class PlaneController : MonoBehaviour
             _currentHitPoints = value;
             if (_currentHitPoints <= 0)
             {
+                _currentHitPoints = 0;
                 TriggerGameOver();
             }
         }
