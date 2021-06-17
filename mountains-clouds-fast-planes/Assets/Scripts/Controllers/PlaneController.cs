@@ -16,10 +16,15 @@ public class PlaneController : MonoBehaviour
     public float minPropellerSpeed;
     public float maxPropellerSpeed;
     
+    public float leaveTime;
     public float throttle;
 
     public int maxHitPoints = 100;
     private int _currentHitPoints;
+
+    private bool isInputEnabled;
+
+    public List<GameObject> departingObjectsBeforeLeaving;
 
     public int hitPoints
     {
@@ -42,6 +47,7 @@ public class PlaneController : MonoBehaviour
 
     private void Start()
     {
+        isInputEnabled = true;
         Application.targetFrameRate = 60;
         
         // fetch the Rigidbody component
@@ -70,7 +76,8 @@ public class PlaneController : MonoBehaviour
     {
         if (_pauseResume.IsRunning)
         {
-            ApplyInput(PlayerInput.getInput());
+            var input = isInputEnabled ? PlayerInput.getInput() : PlayerInput.nullInput;
+            ApplyInput(input);
         }
     }
 
@@ -107,6 +114,16 @@ public class PlaneController : MonoBehaviour
 
     private void TriggerGameOver()
     {
+        throttle = 0f;
+        foreach(GameObject obj in departingObjectsBeforeLeaving) {
+            var departing = obj.GetComponent<IDeparting>();
+            if (departing != null)
+                departing.Depart();
+        }
+        Invoke("LeaveGame", leaveTime);
+    }
+
+    void LeaveGame() {
         SceneManager.LoadScene("Menu");
     }
 }

@@ -11,6 +11,17 @@ namespace Controllers
             public float roll;
             public float yaw;
         }
+
+        public static Input nullInput {
+            get {
+                var input = new Input();
+                input.acceleration = 0f;
+                input.pitch = 0f;
+                input.roll = 0f;
+                input.yaw = 0f;
+                return input;
+            }
+        }
         
         public static Input getInput()
         {
