@@ -18,7 +18,7 @@ Shader "Hidden/ImageCloudsShader"
 
             #include "UnityCG.cginc"
 
-            #define MAX_STEP_COUNT 10
+            #define MAX_STEP_COUNT 12
             #define LIGHT_SAMPLES 4
 
             struct appdata

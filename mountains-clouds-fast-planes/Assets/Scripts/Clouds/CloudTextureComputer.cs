@@ -47,10 +47,6 @@ public class CloudTextureComputer : MonoBehaviour
         CombineTextures(cloudTexture, largeCloudTexture, smallCloudTexture);
     }
 
-    void Update() {
-        CombineTextures(cloudTexture, largeCloudTexture, smallCloudTexture);
-    }
-
     void CombineTextures(RenderTexture result, RenderTexture largeTexture, RenderTexture smallTexture) {
         int res = result.width;
         texturesCombiner.SetTexture(0, "Result", result);

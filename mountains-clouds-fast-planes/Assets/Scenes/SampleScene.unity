@@ -1383,7 +1383,7 @@ MonoBehaviour:
   distanceFog: 1.5
   minlightScatter: 0
   maxlightScatter: 0.1
-  lightFactor: 0.2
+  lightFactor: 1
   distortOffset: 2
   cloudThreshold: 0.2
   smallNoiseFactor: 0.3
