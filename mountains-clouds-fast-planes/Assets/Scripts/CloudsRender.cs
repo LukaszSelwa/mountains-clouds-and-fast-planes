@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ImageEffectAllowedInSceneView, RequireComponent(typeof(Camera))]
-public class RenderTest : MonoBehaviour
+public class CloudsRender : MonoBehaviour
 {
     public Shader shader;
     public Transform container;
@@ -15,7 +15,7 @@ public class RenderTest : MonoBehaviour
     public float fogFactor, distanceFog;
 
     [Range(0.0f, 10.0f)]
-    public float minlightScatter, maxlightScatter;
+    public float minLightScatter, maxLightScatter;
 
     [Range(0.0f, 10.0f)]
     public float lightFactor, distortOffset;
@@ -53,8 +53,8 @@ public class RenderTest : MonoBehaviour
             material.SetFloat("_ScaleTinyWorley", scaleTinyWorley);
 
             material.SetFloat("_FogFactor", fogFactor);
-            material.SetFloat("_MinLightScatter", minlightScatter);
-            material.SetFloat("_MaxLightScatter", maxlightScatter);
+            material.SetFloat("_MinLightScatter", minLightScatter);
+            material.SetFloat("_MaxLightScatter", maxLightScatter);
             material.SetFloat("_LightFactor", lightFactor);
             material.SetFloat("_CloudThreshold", cloudThreshold);
             material.SetFloat("_SmallNoiseFactor", smallNoiseFactor);
