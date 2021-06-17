@@ -4,8 +4,9 @@ using UnityEngine;
 
 public static class TerrainHeightChecker
 {
-    public static float getHeight(Vector3 coordinates)
+    public static float getHeight(Vector3 c)
     {
+        Vector3 coordinates = new Vector3(c.x, c.y, c.z);
         foreach(Terrain t in Terrain.activeTerrains)
         {
             Vector3 siz = t.terrainData.size;
@@ -15,9 +16,9 @@ public static class TerrainHeightChecker
             if(coordinates.z < pos.z || coordinates.z > pos.z + siz.z)
                 continue;
             coordinates = coordinates - pos;
-            return pos.y + t.terrainData.GetHeight((int)coordinates.x, (int)coordinates.y);
+            return pos.y + t.SampleHeight(coordinates);
         }
-
+        
         return 0.0F;
     }
 }
