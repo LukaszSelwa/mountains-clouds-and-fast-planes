@@ -19,7 +19,7 @@ Shader "Hidden/ImageCloudsShader"
             #include "UnityCG.cginc"
 
             #define MAX_STEP_COUNT 10
-            #define LIGHT_SAMPLES 3
+            #define LIGHT_SAMPLES 4
 
             struct appdata
             {
@@ -73,12 +73,14 @@ Shader "Hidden/ImageCloudsShader"
 
             float _ScaleLargeWorley;
             float _ScaleSmallWorley;
+            float _ScaleTinyWorley;
             float _FogFactor;
             float _MinLightScatter;
             float _MaxLightScatter;
             float _LightFactor;
             float _CloudThreshold;
             float _SmallNoiseFactor;
+            float _TinyNoiseFactor;
 
             fixed4 _DistFogColor;
             fixed4 _CloudDarkColor;
@@ -90,6 +92,9 @@ Shader "Hidden/ImageCloudsShader"
             float sampleCloudNoise(float3 pos) {
                 float large = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleLargeWorley).r;
                 float small = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleSmallWorley).g;
+                float tiny  = _NoiseTex.Sample(my_linear_repeat_sampler, pos * _ScaleTinyWorley).b;
+
+                small = lerp(small, tiny, _TinyNoiseFactor);
                 float sample = lerp(large, small, _SmallNoiseFactor);
 
                 if (pos.y > _TopDeclinePlane) {

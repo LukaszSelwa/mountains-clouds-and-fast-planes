@@ -9,10 +9,7 @@ public class RenderTest : MonoBehaviour
     public Transform container;
 
     [Range(0.0f, 1.0f)]
-    public float scaleLargeWorley;
-
-    [Range(0.0f, 1.0f)]
-    public float scaleSmallWorley;
+    public float scaleLargeWorley, scaleSmallWorley, scaleTinyWorley;
 
     [Range(0.0f, 20.0f)]
     public float fogFactor, distanceFog;
@@ -24,7 +21,7 @@ public class RenderTest : MonoBehaviour
     public float lightFactor, distortOffset;
 
     [Range(0.0f, 1.0f)]
-    public float cloudThreshold, smallNoiseFactor;
+    public float cloudThreshold, smallNoiseFactor, tinyNoiseFactor;
 
     public Color distanceFogColor;
     public Color cloudDarkColor;
@@ -53,12 +50,15 @@ public class RenderTest : MonoBehaviour
 
             material.SetFloat("_ScaleLargeWorley", scaleLargeWorley);
             material.SetFloat("_ScaleSmallWorley", scaleSmallWorley);
+            material.SetFloat("_ScaleTinyWorley", scaleTinyWorley);
+
             material.SetFloat("_FogFactor", fogFactor);
             material.SetFloat("_MinLightScatter", minlightScatter);
             material.SetFloat("_MaxLightScatter", maxlightScatter);
             material.SetFloat("_LightFactor", lightFactor);
             material.SetFloat("_CloudThreshold", cloudThreshold);
             material.SetFloat("_SmallNoiseFactor", smallNoiseFactor);
+            material.SetFloat("_TinyNoiseFactor", tinyNoiseFactor);
             material.SetFloat("_DistanceFogFactor", distanceFog);
             material.SetFloat("_DistortOffset", distortOffset);
 
