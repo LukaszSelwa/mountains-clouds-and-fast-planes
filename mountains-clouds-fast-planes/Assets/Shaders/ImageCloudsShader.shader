@@ -1,3 +1,5 @@
+// Code inspired by project https://github.com/SebLague/Clouds
+
 Shader "Hidden/ImageCloudsShader"
 {
     Properties
@@ -18,8 +20,8 @@ Shader "Hidden/ImageCloudsShader"
 
             #include "UnityCG.cginc"
 
-            #define MAX_STEP_COUNT 12
-            #define LIGHT_SAMPLES 4
+            #define MAX_STEP_COUNT 16
+            #define LIGHT_SAMPLES 3
 
             struct appdata
             {
@@ -99,7 +101,7 @@ Shader "Hidden/ImageCloudsShader"
                 float small = tex3Dlod(_NoiseTex, pos * _ScaleSmallWorley).g;
                 float tiny  = tex3Dlod(_NoiseTex, pos * _ScaleTinyWorley).b;
 
-                small = lerp(small, tiny, _TinyNoiseFactor);
+                small = lerp(small, 1-tiny, _TinyNoiseFactor);
                 float sample = lerp(large, small, _SmallNoiseFactor);
 
                 if (pos.y > _TopDeclinePlane) {
