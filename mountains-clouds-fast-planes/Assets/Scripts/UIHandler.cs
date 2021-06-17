@@ -12,6 +12,7 @@ public class UIHandler : MonoBehaviour
 
     private Label speedLabel;
     private Label damageLabel;
+    private Label pos;
 
     void Start()
     {
@@ -19,6 +20,7 @@ public class UIHandler : MonoBehaviour
         // get ui elements by name
         speedLabel = root.Q<Label>("Speed");
         damageLabel = root.Q<Label>("Damage");
+        pos = root.Q<Label>("Position");
         playerPlane = GameObject.Find("PlayerPlane");
         planeControler = playerPlane.GetComponent<PlaneController>();
     }
@@ -31,6 +33,8 @@ public class UIHandler : MonoBehaviour
 
         int dmg = (planeControler.maxHitPoints-planeControler.hitPoints) * 100 / planeControler.maxHitPoints;
         damageLabel.text = $"Damage: {dmg}%";
+
+        pos.text = $"[x,y,z]={planeControler.rb.position}";
     }
 
 }
