@@ -6,3 +6,8 @@
 - `W/S` - pitch
 - `Lewa/Prawa strzałka` - yaw
 - `Strzałka w górę/dół` - ciąg
+
+## Credits
+- dzwięk samolotu: https://www.freesoundeffects.com/free-track/airplane-b131-89257/
+- tekstura gór: https://assetstore.unity.com/packages/2d/textures-materials/rock-textures-4k-179128
+- model strzałki: https://assetstore.unity.com/packages/tools/particles-effects/arrow-waypointer-22642
