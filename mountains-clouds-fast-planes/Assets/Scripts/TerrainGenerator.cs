@@ -49,8 +49,23 @@ public class TerrainGenerator : MonoBehaviour
 
         // Update plane height
         GameObject Plane = GameObject.Find("PlayerPlane");
-        float H = TerrainHeightChecker.getHeight(Plane.transform.position);
-        Plane.transform.position = new Vector3(Plane.transform.position.x, H+30, Plane.transform.position.z);
+        float HP = TerrainHeightChecker.getHeight(Plane.transform.position);
+
+        for (int x = -10; x <= 10; x++) for (int z = -10; z <= 10; z++)
+            {
+                Vector3 v = Plane.transform.position;
+                v.x += x;
+                v.z += z;
+                HP = Mathf.Max(HP, TerrainHeightChecker.getHeight(v));
+            }
+
+        Plane.transform.position = new Vector3(Plane.transform.position.x, HP+30, Plane.transform.position.z);
+
+        // Update Target height
+        GameObject target = GameObject.Find("Target");
+        float HT = TerrainHeightChecker.getHeight(target.transform.position);
+        target.transform.position = new Vector3(target.transform.position.x, HT + 50, target.transform.position.z);
+
     }
 
     float Sigmoid(float X)

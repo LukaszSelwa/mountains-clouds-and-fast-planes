@@ -19,7 +19,6 @@ public class PointsOrchestrator : MonoBehaviour
         // get ui elements by name
         label = root.Q<Label>("Score");
         label.text = "Score: 0";
-        updatePos();
     }
 
     void OnTriggerEnter(Collider col)
