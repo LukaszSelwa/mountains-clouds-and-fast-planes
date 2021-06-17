@@ -115,6 +115,7 @@ public class PlaneController : MonoBehaviour
     private void TriggerGameOver()
     {
         throttle = 0f;
+        isInputEnabled = false;
         foreach(GameObject obj in departingObjectsBeforeLeaving) {
             var departing = obj.GetComponent<IDeparting>();
             if (departing != null)
