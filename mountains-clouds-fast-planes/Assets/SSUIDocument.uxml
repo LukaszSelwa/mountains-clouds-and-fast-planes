@@ -3,4 +3,5 @@
     <ui:Label text="Speed: 100mph" display-tooltip-when-elided="true" name="Speed" style="left: 1%; top: 93%; font-size: 30%; color: rgb(255, 255, 255); position: absolute; -unity-font-style: bold; width: 100%; height: 5%;" />
     <ui:Label text="Damage: 100%" display-tooltip-when-elided="true" name="Damage" style="left: 1%; top: 88%; font-size: 30%; color: rgb(255, 255, 255); position: absolute; -unity-font-style: bold; width: 100%; height: 5%; right: auto;" />
     <ui:Label text="[x,y,z]=[1111,1111,1111]" display-tooltip-when-elided="true" name="Position" style="left: 1%; top: 83%; font-size: 30%; color: rgb(255, 255, 255); position: absolute; -unity-font-style: bold; width: 100%; height: 5%;" />
+    <ui:Button text="MENU" display-tooltip-when-elided="true" name="Menu" style="left: 94%; top: 0.5%; justify-content: center; width: 5%; padding-left: 3px; padding-right: 3px; padding-bottom: 0.5px; -unity-font-style: bold; color: rgba(255, 255, 255, 255); background-color: rgba(255, 255, 255, 0); border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px;" />
 </ui:UXML>

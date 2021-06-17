@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity​Engine.UIElements;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class UIHandler : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class UIHandler : MonoBehaviour
     private Label speedLabel;
     private Label damageLabel;
     private Label pos;
+    private Button menu;
 
     void Start()
     {
@@ -21,6 +23,10 @@ public class UIHandler : MonoBehaviour
         speedLabel = root.Q<Label>("Speed");
         damageLabel = root.Q<Label>("Damage");
         pos = root.Q<Label>("Position");
+        menu = root.Q<Button>("Menu");
+
+        menu.RegisterCallback<ClickEvent>(ev => SceneManager.LoadScene("Menu"));
+      
         playerPlane = GameObject.Find("PlayerPlane");
         planeControler = playerPlane.GetComponent<PlaneController>();
     }
@@ -34,7 +40,7 @@ public class UIHandler : MonoBehaviour
         int dmg = (planeControler.maxHitPoints-planeControler.hitPoints) * 100 / planeControler.maxHitPoints;
         damageLabel.text = $"Damage: {dmg}%";
 
-        pos.text = $"[x,y,z]={planeControler.rb.position}";
+        pos.text = $"(x,y,z)={planeControler.rb.position}";
     }
 
 }
