@@ -38,15 +38,11 @@ Shader "Hidden/GrayscaleImageShader"
             }
 
             sampler2D _MainTex;
-            int _Departed;
 
             fixed4 frag (v2f i) : SV_Target
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // just invert the colors
-                if (_Departed == 1) {
-                    col.rgb = (col.r + col.g + col.b) / 3;
-                }
+                col.rgb = (col.r + col.g + col.b) / 3;
                 return col;
             }
             ENDCG
