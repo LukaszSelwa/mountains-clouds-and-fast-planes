@@ -102,7 +102,7 @@ public class PlaneController : MonoBehaviour
         message = collision.contacts.Aggregate(message, (current, contact) => current + $", {contact.thisCollider}");
         print(message);
 
-        hitPoints -= (int)(collision.impulse.magnitude * 0.01);
+        hitPoints -= (int)(collision.impulse.magnitude * 0.02);
     }
 
     private void TriggerGameOver()
