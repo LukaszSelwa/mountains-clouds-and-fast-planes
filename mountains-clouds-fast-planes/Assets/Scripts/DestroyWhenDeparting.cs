@@ -6,6 +6,7 @@ public class DestroyWhenDeparting : MonoBehaviour, IDeparting
 {
     public void Depart()
     {
-        Destroy(gameObject);
+        var rend = GetComponent<Renderer>();
+        rend.enabled = false;
     }
 }

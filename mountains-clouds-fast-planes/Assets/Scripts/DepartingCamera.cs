@@ -18,7 +18,9 @@ public class DepartingCamera : MonoBehaviour, IDeparting
     }
 
     void OnRenderImage(RenderTexture src, RenderTexture dest) {
-        material.SetInt("_Departed", departed ? 1 : 0);
-        Graphics.Blit(src, dest, material);
+        if (departed)
+            Graphics.Blit(src, dest, material);
+        else
+            Graphics.Blit(src, dest);
     }
 }
