@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641222, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1704,14 +1704,14 @@ MonoBehaviour:
   seed: 2233
   terrainSize: 1000
   chainNumber: 30
-  chainProbability: 0.999
+  chainProbability: 0.9995
   chainSparsity: 8
-  scale: 3
-  roughness: 0.01
+  scale: 4
+  roughness: 0.05
   stErosionRate: 0.8
-  stErosionDuration: 15
+  stErosionDuration: 60
   ndErosionRate: 0.4
-  ndErosionDuration: 2
+  ndErosionDuration: 4
 --- !u!1 &1490114241 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2035258822359727837, guid: 71fbc79ea5b9d4a8cad647f897de45fb,

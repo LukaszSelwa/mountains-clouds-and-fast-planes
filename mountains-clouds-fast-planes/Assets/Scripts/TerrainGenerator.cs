@@ -51,7 +51,7 @@ public class TerrainGenerator : MonoBehaviour
         GameObject Plane = GameObject.Find("PlayerPlane");
         float HP = TerrainHeightChecker.getHeight(Plane.transform.position);
 
-        for (int x = -10; x <= 10; x++) for (int z = -10; z <= 10; z++)
+        for (int x = -100; x <= 100; x+=10) for (int z = -100; z <= 100; z+=10)
             {
                 Vector3 v = Plane.transform.position;
                 v.x += x;
@@ -59,7 +59,7 @@ public class TerrainGenerator : MonoBehaviour
                 HP = Mathf.Max(HP, TerrainHeightChecker.getHeight(v));
             }
 
-        Plane.transform.position = new Vector3(Plane.transform.position.x, HP+30, Plane.transform.position.z);
+        Plane.transform.position = new Vector3(Plane.transform.position.x, HP+20, Plane.transform.position.z);
 
         // Update Target height
         GameObject target = GameObject.Find("Target");
