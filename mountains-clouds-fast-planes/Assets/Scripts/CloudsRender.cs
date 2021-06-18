@@ -45,8 +45,8 @@ public class CloudsRender : MonoBehaviour
             
             material.SetFloat("_BottomPlane", bottomPlane);
             material.SetFloat("_TopPlane", topPlane);
-            material.SetFloat("_BottomDeclinePlane", bottomPlane + container.localScale.y * 0.25f);
-            material.SetFloat("_TopDeclinePlane", bottomPlane + container.localScale.y * 0.5f);
+            material.SetFloat("_BottomDeclinePlane", bottomPlane + container.localScale.y * 0.2f);
+            material.SetFloat("_TopDeclinePlane", bottomPlane + container.localScale.y * 0.70f);
 
             material.SetFloat("_ScaleLargeWorley", scaleLargeWorley);
             material.SetFloat("_ScaleSmallWorley", scaleSmallWorley);
