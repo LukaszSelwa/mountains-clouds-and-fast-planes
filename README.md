@@ -6,6 +6,8 @@
 - `W/S` - pitch
 - `Lewa/Prawa strzałka` - yaw
 - `Strzałka w górę/dół` - ciąg
+- `Spacja` - pauza
+- `Esc` - powrót do menu
 
 ## Credits
 - dzwięk samolotu: https://www.freesoundeffects.com/free-track/airplane-b131-89257/
