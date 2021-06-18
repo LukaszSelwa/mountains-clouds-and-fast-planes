@@ -15,6 +15,9 @@ public class PlaneController : MonoBehaviour
 
     public float minPropellerSpeed;
     public float maxPropellerSpeed;
+
+    public float liftCoefficient;
+    public float maxLift;
     
     public float leaveTime;
     public float throttle;
@@ -57,9 +60,6 @@ public class PlaneController : MonoBehaviour
         // fetch the transform of the propeller
         _propTransform = transform.Find("AirplaneModel").Find("fuselage02").Find("prop_tip01");
         
-        // set the initial throttle
-        throttle = 0.5f;
-        
         _currentHitPoints = maxHitPoints;
         
         _pauseResume = GameObject.Find("PauseGame").GetComponent<PauseResume>();
@@ -79,6 +79,12 @@ public class PlaneController : MonoBehaviour
         {
             var input = isInputEnabled ? PlayerInput.getInput() : PlayerInput.nullInput;
             ApplyInput(input);
+            
+            // apply lift:
+            var speedForward = Vector3.Project(rb.velocity, transform.forward).sqrMagnitude;
+            var liftMagnitude = Math.Min(Math.Max(liftCoefficient * speedForward, 0f), maxLift);
+            var lift = liftMagnitude * transform.up;
+            rb.AddForce(lift, ForceMode.Acceleration);
         }
     }
 
@@ -128,4 +134,5 @@ public class PlaneController : MonoBehaviour
     void LeaveGame() {
         SceneManager.LoadScene("Menu");
     }
+
 }
