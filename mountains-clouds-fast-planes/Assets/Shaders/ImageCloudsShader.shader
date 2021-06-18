@@ -131,10 +131,10 @@ Shader "Hidden/ImageCloudsShader"
                 return _FluidTex.Sample(fluid_linear_repeat_sampler, pos);
             } 
 
-            float2 sampleDensity(float4 pos, float4 rayDir, float distance, float4 lightDir) {
+            float2 sampleDensity(float4 pos, float4 rayDir, float distance, float4 lightDir, float randomOffset) {
                 float density = 0.0;
                 float sample;
-                float step = distance / MAX_STEP_COUNT;
+                float step = randomOffset + distance / MAX_STEP_COUNT;
                 float scatteredlight = 0.0;
                 float transmittance = 1.0;
                 float lightScatterCoef = lerp(_MinLightScatter, _MaxLightScatter, length(cross(lightDir, -rayDir)));
@@ -180,9 +180,8 @@ Shader "Hidden/ImageCloudsShader"
                     float cloudRayLen = dstBack - dstFront;
 
                     float3 pos = rayOrigin + rayDir * dstFront;
-                    pos += _DistortOffset * sampleDistortNoise(i.uv); 
 
-                    float2 march = sampleDensity(float4(pos, 0), float4(rayDir, 0), cloudRayLen, float4(lightDirection, 0));
+                    float2 march = sampleDensity(float4(pos, 0), float4(rayDir, 0), cloudRayLen, float4(lightDirection, 0), _DistortOffset * sampleDistortNoise(i.uv));
                     fixed4 lightCol = lerp(1, _CloudDarkColor, 1/(_LightFactor * march.y + 1));
                     col = saturate(col * march.x + lightCol * (1 - march.x));
                     
