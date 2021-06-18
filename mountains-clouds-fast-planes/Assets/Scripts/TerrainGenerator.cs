@@ -51,7 +51,7 @@ public class TerrainGenerator : MonoBehaviour
         GameObject Plane = GameObject.Find("PlayerPlane");
         float HP = TerrainHeightChecker.getHeight(Plane.transform.position);
 
-        for (int x = -100; x <= 100; x+=10) for (int z = -100; z <= 100; z+=10)
+        for (int x = -10; x <= 10; x++) for (int z = -10; z <= 10; z++)
             {
                 Vector3 v = Plane.transform.position;
                 v.x += x;
@@ -59,7 +59,7 @@ public class TerrainGenerator : MonoBehaviour
                 HP = Mathf.Max(HP, TerrainHeightChecker.getHeight(v));
             }
 
-        Plane.transform.position = new Vector3(Plane.transform.position.x, HP+20, Plane.transform.position.z);
+        Plane.transform.position = new Vector3(Plane.transform.position.x, HP+30, Plane.transform.position.z);
 
         // Update Target height
         GameObject target = GameObject.Find("Target");
@@ -206,6 +206,7 @@ public class TerrainGenerator : MonoBehaviour
                     }
                 }
         }
+
         ScaleHeightmap(0.5F, scale);
         Erode(stErosionRate, stErosionDuration);
 
@@ -294,30 +295,33 @@ public class TerrainGenerator : MonoBehaviour
 
     void AddChainedPoint(int x, int y, float rangeLow, float rangeHigh, int chainDist, float chainProb, float levelChange)
     {
-        float heightChange = (float)random.NextDouble()*(rangeHigh-rangeLow)+rangeLow;
+        do 
+        {
+            float heightChange = (float)random.NextDouble()*(rangeHigh-rangeLow)+rangeLow;
 
-        if(x <= 0)
-            return;
-        if(x >= resolution-1)
-            return;
-        if(y <= 0)
-            return;
-        if(y >= resolution-1)
-            return;
+            if(x <= 0 || x >= resolution-1)
+                break;
+            if(y <= 0 || y >= resolution-1)
+                break;
 
-        heightmap[x, y] = heightmap[x,y] + (1.0F - 2.0F*System.Math.Abs(heightmap[x,y])) * heightChange;
-        
-        var positionChange = randInUnitCircle() * chainDist;
+            heightmap[x, y] = heightmap[x,y] + (1.0F - 2.0F*System.Math.Abs(heightmap[x,y])) * heightChange;
+            
+            var positionChange = randInUnitCircle() * chainDist;
 
-        int x_new = x + (int)positionChange.x;
-        int y_new = y + (int)positionChange.y;
+            int x_new = x + (int)positionChange.x;
+            int y_new = y + (int)positionChange.y;
 
-        x_new = (x_new + resolution) % resolution;
-        y_new = (y_new + resolution) % resolution;
+            x_new = (x_new + resolution) % resolution;
+            y_new = (y_new + resolution) % resolution;
 
-        float lc = 2.0F*((float)random.NextDouble()-0.5F)*levelChange;
+            float lc = 2.0F*((float)random.NextDouble()-0.5F)*levelChange;
 
-        if (random.NextDouble() < chainProb)
-            AddChainedPoint(x_new, y_new, heightChange - lc, heightChange + lc, chainDist, chainProb, levelChange);
+            rangeLow = heightChange - lc;
+            rangeHigh = heightChange + lc;
+
+            x = x_new;
+            y = y_new;
+
+        } while(random.NextDouble() < chainProb);
     }
 }
