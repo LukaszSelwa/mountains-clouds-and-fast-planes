@@ -211,7 +211,7 @@ public class TerrainGenerator : MonoBehaviour
 
         for (int i = hasTopN; i < resolution - hasBotN; i++)
             for (int j = hasLeftN; j < resolution - hasRightN; j++)
-                heightmap[i,j] += ((float)random.NextDouble()-0.5F)*roughness;
+                heightmap[i,j] += ((float)random.NextDouble()-0.5F)*roughness*(float)System.Math.Pow(heightmap[i,j], 4);
 
         Erode(ndErosionRate, ndErosionDuration);
     }
