@@ -14,6 +14,9 @@ Shader "Custom/MountainsShader"
         _Blend ("Blend", Range(0,1)) = 0
         _SnowHeight ("Snow Height", Float) = 0
         _SnowBlend ("Snow Blend", Range(0, 10)) = 0
+        _BumpMap ("Bumpmap", 2D) = "bump" {}
+        _HeightMap("Height Map", 2D) = "white" {}
+        _HeightPower("Height Power", Range(0,.125)) = 0
     }
     SubShader
     {
@@ -27,18 +30,24 @@ Shader "Custom/MountainsShader"
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
 
-        sampler2D _GrassTex;
-        sampler2D _RockTex;
-        sampler2D _SnowTex;
-
         struct Input
         {
-            float3 worldPos;
-            float3 worldNormal;
             float2 uv_RockTex;
             float2 uv_GrassTex;
             float2 uv_SnowTex;
+            float2 uv_BumpMap;
+            float2 uv_HeightMap;
+            float3 worldNormal;
+            float3 worldPos;
+            float3 viewDir;
+            INTERNAL_DATA
         };
+
+        sampler2D _GrassTex;
+        sampler2D _RockTex;
+        sampler2D _SnowTex;
+        sampler2D _BumpMap;
+        sampler2D _HeightMap;
 
         half _Glossiness;
         half _Metallic;
@@ -49,6 +58,7 @@ Shader "Custom/MountainsShader"
         float _Blend;
         float _SnowHeight;
         float _SnowBlend;
+        float _HeightPower;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -59,16 +69,18 @@ Shader "Custom/MountainsShader"
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            float slope = saturate(dot(IN.worldNormal, _GrassDirection));
+            float2 texOffset = ParallaxOffset(tex2D(_HeightMap, IN.uv_HeightMap).r, _HeightPower, IN.viewDir);
+
+            float slope = saturate(dot(WorldNormalVector(IN, o.Normal), _GrassDirection));
             float grassFactor = saturate((slope - _Threshold) / (_Blend * (1-_Threshold)));
 
             float snowFactor = saturate((IN.worldPos.y - _SnowHeight) / (_SnowBlend *_SnowHeight));
 
 
             // Albedo comes from a texture tinted by color
-            fixed4 rock = tex2D (_RockTex, IN.uv_RockTex) * _RockColor;
-            fixed4 grass = tex2D (_GrassTex, IN.uv_GrassTex) * _GrassColor;
-            fixed4 snow = tex2D (_SnowTex, IN.uv_SnowTex);
+            fixed4 rock = tex2D (_RockTex, IN.uv_RockTex+texOffset) * _RockColor;
+            fixed4 grass = tex2D (_GrassTex, IN.uv_GrassTex+texOffset) * _GrassColor;
+            fixed4 snow = tex2D (_SnowTex, IN.uv_SnowTex+texOffset);
             grass = lerp(grass, snow, snowFactor);
             fixed4 c = lerp(rock, grass, grassFactor);
             o.Albedo = c.rgb;
@@ -77,6 +89,7 @@ Shader "Custom/MountainsShader"
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
             o.Alpha = c.a;
+            o.Normal = lerp(UnpackNormal (tex2D (_BumpMap, IN.uv_BumpMap+texOffset)), o.Normal, grassFactor);
         }
         ENDCG
     }
